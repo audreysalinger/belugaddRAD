@@ -1,3 +1,5 @@
+## Initial quality assessment
+
 Before beginning my ddRAD analysis with the Stacks workflow, I want to do an initial read quality check.
 
 I have already looked at a few lines of some R1 and R2 fastq files, to visually assess that the read structure is as expected.
