@@ -3,7 +3,7 @@
 #SBATCH --job-name=process_radtags-for-lane-effects
 #SBATCH --mail-user=audrey.salinger@smu.ca
 #SBATCH --mail-type=BEGIN,END,FAIL
-#SBATCH --array=2-178
+#SBATCH --array=1-178
 #SBATCH --mem-per-cpu=10G
 #SBATCH --cpus-per-task=10
 #SBATCH --time=01:00:00
