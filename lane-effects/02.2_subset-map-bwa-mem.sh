@@ -3,7 +3,7 @@
 #SBATCH --job-name=subset-map-bwa-mem
 #SBATCH --mail-user=audrey.salinger@smu.ca
 #SBATCH --mail-type=BEGIN,END,FAIL
-#SBATCH --array=2-20%10
+#SBATCH --array=1-20%10
 #SBATCH --cpus-per-task=20
 #SBATCH --mem-per-cpu=15G
 #SBATCH --time=02:30:00
