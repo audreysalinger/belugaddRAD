@@ -16,3 +16,6 @@ module load bwa/0.7.18
 bwa index $genome_fa \
 	-p ~/scratch/bwa/beluga_db \
 	&> ~/scratch/bwa/logs/bwa_index.oe
+
+#--- copy the resulting bwa db to projects directory ---#
+cp ~/scratch/bwa/beluga_db ${PROJECTS}
