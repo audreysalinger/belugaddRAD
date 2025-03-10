@@ -10,8 +10,8 @@
 
 ###############################################################
 #  re-running Stacks reference-based pipeline after removing  #
-#                samples with read depth < 5:                 #
-#           using two alpha stringencies, 0.01 and 0.001      #
+#                samples with read depth < 5X:                #
+#         using two alpha stringencies, 0.01 and 0.001        #
 ###############################################################
 
 PROJECTS=~/projects/def-frasiert/beluga-ddRAD
@@ -62,3 +62,10 @@ gzip gt0.01_RDfilter_initial.vcf
 cd ~/scratch/stacks_ref/postRDfilter/gt0.001
 mv populations.all.vcf gt0.001_RDfilter_initial.vcf
 gzip gt0.001_RDfilter_initial.vcf
+
+#--- copy outputs to projects directory ---#
+mkdir ${PROJECTS}/stacks-output
+mkdir ${PROJECTS}/stacks-output/with-RD-filter
+
+cp -r ~/scratch/stacks_ref/postRDfilter/gt0.01 ${PROJECTS}/stacks-output/with-RD-filter
+cp -r ~/scratch/stacks_ref/postRDfilter/gt0.001 ${PROJECTS}/stacks-output/with-RD-filter
