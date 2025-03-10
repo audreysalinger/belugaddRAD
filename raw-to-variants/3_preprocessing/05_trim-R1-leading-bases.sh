@@ -57,3 +57,8 @@ java -Xmx8G -jar ~/projects/def-frasiert/beluga-ddRAD/java/trimmomatic-0.39.jar 
 ~/scratch/trimC/${SAMPLE}'.fastq.gz' \
 ~/scratch/trimmed-R1/${SAMPLE}'_S'${SLURM_ARRAY_TASK_ID}'_L001_R1_001.fastq.gz' \
 LEADING:3 &> ${PROJECTS}/trimN_logs/${SAMPLE}.trimN.oe
+
+
+#--- move trimmed reads into a directory from which to run Stacks ---#
+mkdir ~/scratch/stacks-input
+cp ~/scratch/trimmed-R1/Bel0* ~/scratch/stacks-input/
