@@ -43,5 +43,3 @@
 - **13_ref_map-0.01.sh** (run Stacks ref_map.pl using alphas of 0.01)
 - **14_ref_map-0.001.sh** (run Stacks ref_map.pl using alphas of 0.001)
 - **15_ref_map-RDfilter.sh** (filter for read depth >5X and re-run Stacks ref_map.pl at both alpha stringencies)
-
-![raw-to-variants/flowchart-raw-to-variants.pdf]
