@@ -1,0 +1,1330 @@
+---
+title: "Beluga ddRADseq Inbreeding Coefficient Analyses"
+author: "Audrey Salinger"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+library(tidyverse)
+library(dplyr)
+library(vcfR)
+library(readr)
+library(reshape2)
+library(inbreedR)
+library(cowplot)
+library(gridGraphics)
+library(ggplot2)
+library(arsenal)
+library(dagitty)
+library(cmdstanr)
+library(posterior)
+library(bayesplot)
+library(ggridges)
+
+
+setwd("/Users/audreysalinger/PhD/beluga/r_analyses")
+```
+
+# Objective
+
+I have completed bioinformatic analysis of the ddRAD sequencing data for the beluga project using two alpha value thresholds for calling SNPs and calling genotypes: 0.01 and 0.001.  
+  
+Summary of the total SNPs passing filters for the two data sets:  
+**0.01  = 28,852 (154 samples)**  
+**0.001 = 16,122 (154 samples)**  
+
+*In this file I will detail the process used for the remaining analyses, including estimating inbreeding coefficients, generating plots, and performing the Bayesian statistical analysis.*
+
+First I will import the final VCFs:
+```{r import vcfs}
+vcf_0.01 = read.vcfR("final-vcfs/0.01_fully_filtered.vcf.gz", verbose = FALSE)
+vcf_0.001 = read.vcfR("final-vcfs/0.001_fully_filtered.vcf.gz", verbose = FALSE)
+```
+
+# 1. Estimating inbreeding coefficients
+
+I want to calculate inbreeding coefficients for each individual. There are many different methods to estimate individual inbreeding coefficients; I will calculate F, sMLH, IR, and HL.
+
+## Calculating F with VCFtools
+
+I will first use `VCFtools --het` to calculate the inbreeding coefficient F for each individual; the remainder of the analysis will use R.  
+  
+The resulting value F represents the deviation between observed and expected heterozygosity within an individual.
+
+```{r import vcftools het}
+F_0.01 = read_tsv("inbreeding-coefficients/0.01_vcftools.het", col_names = TRUE)
+F_0.001 = read_tsv("inbreeding-coefficients/0.001_vcftools.het", col_names = TRUE)
+```
+
+## Calculate sMLH with InbreedR
+
+**Standardized multi-locus heterozygosity (sMLH)** is defined by InbreedR as the total number of heterozygous loci in an individual divided by the sum of average observed heterozygosities in the population over the subset of loci successfully typed in the focal individual. This inbreeding coefficient is a way to assess heterozygosity across an indivdual's genome relative to the heterozygosity observed in the population/sample set. Because individuals are typed at different numbers of marker loci, standardizing ensures that the heterozygosity of all individuals is measured on the same scale.  
+  
+*From Coltman, D. W., Pilkington, J. G., Smith, J. A., & Pemberton, J. M. (1999). Parasite-mediated selection against inbred Soay sheep in a free-living, island population. Evolution, 1259-1267.*  
+
+### Convert VCF to InbreedR working format
+
+For InbreedR, the input needs to be an individual x locus matrix or data.frame in which rows represent individuals and each column represents a locus. If an individual is heterozygous at a given locus, it is coded as 1, whereas a homozygote is coded as 0,and missing data are coded as NA.  
+  
+First, I can use vcfR `extract.gt` to generate a matrix of loci x individuals. I can then transpose the matrix to get the proper individual x locus format.  
+  
+InbreedR has a function `convert_raw` that converts raw genotype data into the required working format. This conversion function requires a raw genotype matrix with individuals in rows and each locus in two adjacent columns.  
+
+I will need to split my genotypes (which are in format 0/1) into two adjacent columns, one for each allele.  
+  
+Then I can use the `convert_raw` function for the final conversion step. Inbreed R also has a function `check_data` that will make sure the data are in the correct formatting; it checks that: (1) the genotype data just contains 3 elements, which is 0 for homozygote, 1 for heterozygote and NA for missing data, (2) the number of individuals corresponds to the number of rows and the number of loci corresponds to the number of columns, (3) the data type is numeric.  
+
+```{r InbreedR data setup}
+# extract genotypes and convert to allelic state 0/1
+# output is a matrix of genotypes w/ a column for each individual & a row for each SNP/locus
+genotypes_01 = extract.gt(vcf_0.01)
+genotypes_001 = extract.gt(vcf_0.001)
+
+# transpose the matrix so that rows are individuals & and each column is a locus
+genotypes_01 = t(genotypes_01)
+genotypes_001 = t(genotypes_001)
+
+# split genotypes into two adjacent columns, one for each allele 
+# apply(matrix, 2 = apply to columns, apply the function colsplit)
+# colsplit(x = string to split up, / = expression to split on, a & b = suffixes of new columns)
+# cbind to re-bind together all the individual locus columns that have been split in 2
+split_gt_01 = do.call(cbind, apply(genotypes_01, 2, function(x) colsplit(x, "/", c("a","b"))))
+split_gt_001 = do.call(cbind, apply(genotypes_001, 2, function(x) colsplit(x, "/", c("a","b"))))
+
+# convert data to inbreedR input format
+inbreedR_input_01 = inbreedR::convert_raw(split_gt_01)
+inbreedR_input_001 = inbreedR::convert_raw(split_gt_001)
+
+# check the data formatting
+check_data(inbreedR_input_01, num_ind = 154, num_loci = 28852)
+check_data(inbreedR_input_001, num_ind = 154, num_loci = 16122)
+```
+
+In order to check that this conversion has maintained data integrity, I will ensure that the first 5 and last 5 loci for the first 5 and last 5 samples are still in agreement for both data sets.
+
+First, extracting this data from the original VCFs:
+```
+#!/bin/bash
+
+#################################################################################
+#  extract first 5 and last 5 genotypes for the first 5 and last 5 individuals  #
+#                  to check against transformed genotype files                  #
+#################################################################################
+
+cd ../final-vcfs
+
+###################
+#  0.01 data set  #
+###################
+
+#--- get first 5 sample names and save to a temp file---#
+zgrep -v "^##" 0.01_fully_filtered.vcf.gz | head -n 1 | cut -f 10-14 | awk '{for(i=1;i<=NF;i++) $i=substr($i,1,8)}1' > 0.01_first5ind
+
+#--- add first 5 genotypes for the first 5 samples to temp file---#
+zgrep -v "^##" 0.01_fully_filtered.vcf.gz | head -n 6 | tail -n 5 | cut -f 10-14 | awk '{for(i=1;i<=NF;i++) $i=substr($i,1,3)}1' >> 0.01_first5ind
+
+#--- add last 5 genotypes for the first 5 samples to temp file ---#
+zgrep -v "^##" 0.01_fully_filtered.vcf.gz | tail -n 5 | cut -f 10-14 | awk '{for(i=1;i<=NF;i++) $i=substr($i,1,3)}1' >> 0.01_first5ind
+
+
+#--- get last 5 sample names and save to another temp file ---#
+zgrep -v "^##" 0.01_fully_filtered.vcf.gz | head -n 1 | cut -f 159-163 | awk '{for(i=1;i<=NF;i++) $i=substr($i,1,8)}1' > 0.01_last5ind
+
+#--- add first 5 genotypes for the last 5 samples to temp file ---#
+zgrep -v "^##" 0.01_fully_filtered.vcf.gz | head -n 6 | tail -n 5 | cut -f 159-163 | awk '{for(i=1;i<=NF;i++) $i=substr($i,1,3)}1' >> 0.01_last5ind
+
+#--- add last 5 genotypes for the last 5 samples to temp file ---#
+zgrep -v "^##" 0.01_fully_filtered.vcf.gz | tail -n 5 | cut -f 159-163 | awk '{for(i=1;i<=NF;i++) $i=substr($i,1,3)}1' >> 0.01_last5ind
+
+
+#--- paste temp files together ---#
+paste -d ' ' 0.01_first5ind 0.01_last5ind > ../gt-conversion-check/0.01_vcf_gt_subset
+
+#--- remove temp files ---#
+rm 0.01_first5ind
+rm 0.01_last5ind
+
+
+####################
+#  0.001 data set  #
+####################
+
+#--- get first 5 sample names and save to a temp file---#
+zgrep -v "^##" 0.001_fully_filtered.vcf.gz | head -n 1 | cut -f 10-14 | awk '{for(i=1;i<=NF;i++) $i=substr($i,1,8)}1' > 0.001_first5ind
+
+#--- add first 5 genotypes for the first 5 samples to temp file---#
+zgrep -v "^##" 0.001_fully_filtered.vcf.gz | head -n 6 | tail -n 5 | cut -f 10-14 | awk '{for(i=1;i<=NF;i++) $i=substr($i,1,3)}1' >> 0.001_first5ind
+
+#--- add last 5 genotypes for the first 5 samples to temp file ---#
+zgrep -v "^##" 0.001_fully_filtered.vcf.gz | tail -n 5 | cut -f 10-14 | awk '{for(i=1;i<=NF;i++) $i=substr($i,1,3)}1' >> 0.001_first5ind
+
+
+#--- get last 5 sample names and save to another temp file ---#
+zgrep -v "^##" 0.001_fully_filtered.vcf.gz | head -n 1 | cut -f 159-163 | awk '{for(i=1;i<=NF;i++) $i=substr($i,1,8)}1' > 0.001_last5ind
+
+#--- add first 5 genotypes for the last 5 samples to temp file ---#
+zgrep -v "^##" 0.001_fully_filtered.vcf.gz | head -n 6 | tail -n 5 | cut -f 159-163 | awk '{for(i=1;i<=NF;i++) $i=substr($i,1,3)}1' >> 0.001_last5ind
+
+#--- add last 5 genotypes for the last 5 samples to temp file ---#
+zgrep -v "^##" 0.001_fully_filtered.vcf.gz | tail -n 5 | cut -f 159-163 | awk '{for(i=1;i<=NF;i++) $i=substr($i,1,3)}1' >> 0.001_last5ind
+
+
+#--- paste temp files together ---#
+paste -d ' ' 0.001_first5ind 0.001_last5ind > ../gt-conversion-check/0.001_vcf_gt_subset
+
+#--- remove temp files ---#
+rm 0.001_first5ind
+rm 0.001_last5ind
+```
+
+```{r check genotype conversion integrity}
+# import gt subsets from original vcfs
+gt_check_01 = read_delim("gt-conversion-check/0.01_vcf_gt_subset", delim = ' ', col_names = TRUE)
+gt_check_001 = read_delim("gt-conversion-check/0.001_vcf_gt_subset", delim = ' ', col_names = TRUE)
+
+# extract the same subset from the genotypes matrices created in InbreedR data setup (and edit to match formatting)
+genotypes_01_subset = as.data.frame(t(genotypes_01[c(1:5, 150:154), c(1:5, 28848:28852)]))
+genotypes_01_subset[is.na(genotypes_01_subset)] = './.'
+
+genotypes_001_subset = as.data.frame(t(genotypes_001[c(1:5, 150:154), c(1:5, 16118:16122)]))
+genotypes_001_subset[is.na(genotypes_001_subset)] = './.'
+
+# compare genotype matrix to the original vcf
+gt_check_01 == genotypes_01_subset
+gt_check_001 == genotypes_001_subset
+```
+
+For this subset, the genotypes matrices created do match the original vcfs, as expected. I will check further by comparing this subset of genotypes from the original vcfs to the final InbreedR input data frames (where columns are loci, 0 = homozygous, and 1 = heterozygous).
+
+```{r subset InbreedR inputs for conversion check}
+as.data.frame(t(inbreedR_input_01[c(1:5, 150:154), c(1:5, 28848:28852)]))
+as.data.frame(t(inbreedR_input_001[c(1:5, 150:154), c(1:5, 16118:16122)]))
+```
+
+Indeed for the subset, the original vcf genotypes and the genotypes in the final InbreedR converted files match. All good to proceed!
+
+### Identity disequilibrium
+
+Before moving on with the calculation of inbreeding coefficients, I first want to estimate identity disequilibrium (ID, g2) for the data using InbreedR's `g2_snps` function.  
+  
+Identity disquilibrium is the phenomenon in which variation in inbreeding causes heterozygosity to be correlated across loci. In order to (theoretically) detect inbreeding depression, markers should have nonzero variance and heterozygosity of markers should correlate with the heterozygosity of functional loci. Assessing identity disequilibrium will assess the potential of these data to detect heterozygosity-fitness correlations (HFCs).  
+  
+g2 is a measure of identity disequilibrium, which reflects how heterozygosity (or homozygosity) is correlated across markers/loci. The `g2_snps` function in InbreedR permutes the genetic data to generate a p-value for the null hypothesis of no variance in inbreeding in the samples (i.e., g2 = 0, all individuals experience the same level of inbreeding). Low g2 values may suggest low expected correlations between heterozygosity and inbreeding.
+
+**SHOULD I BOOT OVER INDIVIDUALS OR LOCI AND HOW DOES THAT CHANGE INTERPRETATION OF G2 MEANING IF AT ALL?**
+
+```{r InbreedR g2}
+# for the 0.01 data set
+g2_01 = g2_snps(inbreedR_input_01,
+                nperm = 1000, nboot = 1000, boot_over = "inds", CI = 0.95,
+                parallel = TRUE, ncores = 4)
+print(g2_01)
+
+# for the 0.001 data set
+g2_001 = g2_snps(inbreedR_input_001,
+                 nperm = 1000, nboot = 1000, boot_over = "inds", CI = 0.95,
+                 parallel = TRUE, ncores = 4)
+print(g2_001)
+
+# plot the g2 outputs: the distribution of g2 estimates from bootstrap samples over individuals w/ 95% CIs
+# black dot = the empirical g2 estimate
+## open pdf file
+pdf("plots/g2-plots.pdf", width = 7, height = 4)
+## create plots
+par(mfrow = c(1,2))
+plot(g2_01, main = "0.01", col = "#266D73")
+plot(g2_001, main = "0.001", col = "#C7BF3C")
+## close the file
+dev.off()
+```
+
+**WHAT DOES THIS MEAN? HOW DO I INTERPRET THIS??**
+
+### Calculate sMLH
+
+```{r InbreedR sMLH}
+# calculate sMLH for both data sets
+sMLH_0.01 = sMLH(inbreedR_input_01)
+sMLH_0.001 = sMLH(inbreedR_input_001)
+
+# create a data frame to hold the sMLH data; in the first column, shorten sample names to just Bel numbers
+sMLH_df = data.frame(sample = substr(rownames(genotypes_01), 1, 8),
+                     sMLH_0.01,
+                     sMLH_0.001)
+
+# save sMLH values to a file
+write.table(sMLH_df, file = "inbreeding-coefficients/sMLH.tsv", sep = "\t", row.names = FALSE)
+```
+
+## Calculate IR and HL with GENHET
+
+Next I want to calculate internal relatedness. Internal relatedness (IR) is a measure of of homozygosity that incorporates allele frequency, where being homozygous for a rarer allele will suggest a higher inbreeding estimate than being homozygous for a common allele. The equation, from Amos et al. 2001, is as follows:  
+  
+IR = (2H - ∑fi) / (2N - ∑fi)  
+  
+where H = number of homozygous loci, N = number of loci total, fi = frequency of the ith allele contained in the genotype.  
+  
+IR values centred more or less on zero suggest individuals born to "unrelated" parents. Negative values suggest relatively "outbred" individuals. High positive values are suggestive of inbreeding.  
+  
+I will also use GENHET to calculate homozygosity by locus (HL), which is a measure of homozygosity that weighs the contribution of each locus to the homozygosity index depending on their allelic variability in order to avoid underestimating heterozygosity of individuals carrying rare alleles. The equation, from Aparicio et al. 2006, is as follows:  
+  
+HL = ∑Eh / (∑Eh + ∑Ej)  
+  
+where Eh and Ej are the expected heterozygosities of the loci that an individual bears in homozygosis (h) and heterozygosis (j), respectively. 
+  
+GENHET is a function written for the program R that calculates 5 different individual heterozygosity estimates:  
+1. proportion of heterozygous loci (PHt) in an individual: PHt = number of heterozygous loci / number of genotyped loci  
+2. standardized heterozygosity based on the mean expected heterozygosity Hs_exp, Coltman 1999): Hs_exp = PHt / mean expected heterozygosity of typed loci  
+3. standardized heterozygosity based on the mean observed heterozygosity (Hs_obs): Hs_obs = PHt / mean observed heterozygosity of typed loci  
+4. internal relatedness (IR) (Amos 2001): IR = (2H – ∑fi) / (2N – ∑fi), where H is the number of loci that are homozygous, N is the number of loci and fi is the frequency of the ith allele contained in the genotype   
+5. homozygosity by locus (HL) (Aparicio 2006): HL = ∑Eh / (∑Eh + ∑Ej), where Eh and Ej are the expected heterozygosities of the loci that an individual bears in homozygosis (h) and in heterozygosis (j), respectively.  
+  
+To use GENHET to calculate IR and HL, first need to create a file containing the genotypes of each individual:  
+- the first column should contain the individuals’ identifiers (sample names)  
+- the following columns contain the genotypes: 2 columns per locus: 1 for each allele; alleles have to be coded as numeric values; missing data must be coded as “NA”  
+- the first row may contain the names of the columns, but that's not mandatory
+
+```{r GENHET genotypes input}
+# append a column of sample names to the existing split_gt data frames
+genhet_input_01 = add_column(split_gt_01, sample = sMLH_df$sample, .before = 1)
+genhet_input_001 = add_column(split_gt_001, sample = sMLH_df$sample, .before = 1)
+```
+
+To calculate individual heterozygosity estimates, GENHET needs allele frequencies. The manual for GENHET states that the simplest option is to ask GENHET to calculate the allele frequencies in your file of genotypes; to do this I must also provide a file giving the names of the loci in the same order as in the file of genotypes:
+```{r GENHET loci input}
+# create list of loci by capturing the columns of the input file less the first samples name column
+loci_01 = colnames(genhet_input_01[-1])
+loci_001 = colnames(genhet_input_001[-1])
+
+# remove the trailing characters (e.g., :-.a), keep all characters through 5th from end, remove last 4 characters
+loci_01 = str_sub(loci_01, end = -5)
+loci_001 = str_sub(loci_001, end = -5)
+
+# remove duplicate loci names (they each appear twice since that was the original input format)
+loci_01 = unique(loci_01)
+loci_001 = unique(loci_001)
+```
+
+I downloaded the GENHET function, manual, and example files directory into the working directory from http://www.aureliecoulon.net/research/ac-computer-programs.html.  
+  
+Load the GENHET code:
+```{r load GENHET}
+source("GENHETv3.1/GENHETv3.1.R")
+```
+
+Run GENHET:
+```{r run GENHET for IR and HL, eval=FALSE, include=FALSE}
+# to launch, must tell R what to name the output
+# arguments: dat = genotypes object; estimfreq = calculate allele freq T (true) or F (false) , locname = loci list
+genhet_0.01 = GENHET(dat = genhet_input_01, estimfreq = "T", locname = loci_01)
+genhet_0.001 = GENHET(dat = genhet_input_001, estimfreq = "T", locname = loci_001)
+
+# save outputs
+write.table(genhet_0.01, file = "inbreeding-coefficients/GENHET_0.01_results.tsv", sep = "\t")
+write.table(genhet_0.001, file = "inbreeding-coefficients/GENHET_0.001_results.tsv", sep = "\t")
+```
+
+GENHET takes quite a while to run, so I have commented out writing new files, to avoid damaging the saved versions.
+For future analyses, I will read in the saved table.
+
+```{r extract GENHET IR and HL}
+# read in saved GENHET output tables
+genhet_0.01_df = read.table("inbreeding-coefficients/GENHET_0.01_results.tsv")
+genhet_0.001_df = read.table("inbreeding-coefficients/GENHET_0.001_results.tsv")
+
+# extract IR and save IR values to their own data frame
+IR_df = data.frame(sample = genhet_0.01_df$sampleid,
+                   IR_0.01 = genhet_0.01_df$IR,
+                   IR_0.001 = genhet_0.001_df$IR)
+
+# extract HL and save HL values to their own data frame
+HL_df = data.frame(sample = genhet_0.01_df$sampleid,
+                   HL_0.01 = genhet_0.01_df$HL,
+                   HL_0.001 = genhet_0.001_df$HL)
+
+# save data frames
+write.table(IR_df, file = "inbreeding-coefficients/IR.tsv", sep = "\t")
+write.table(HL_df, file = "inbreeding-coefficients/HL.tsv", sep = "\t")
+```
+
+# 2. Plotting results
+
+## Inbreeding coefficient histograms
+
+I will plot inbreeding coefficient (F, sMLH, IR, HL) values in histograms for each data set:
+```{r histogram of inbreeding coefficients, fig.height=16, fig.width=10}
+# open pdf file
+pdf("plots/coefficient-histograms.pdf", width = 10, height = 12)
+
+# create plots
+F_0.01_hist = ~hist(F_0.01$F, main = "0.01", col = "#266D73", xlab = "F")
+F_0.001_hist = ~hist(F_0.001$F, main = "0.001", col = "#C7BF3C", xlab = "F")
+
+sMLH_0.01_hist = ~hist(sMLH_df$sMLH_0.01, main = "0.01", col = "#266D73", xlab = "sMLH")
+sMLH_0.001_hist = ~hist(sMLH_df$sMLH_0.001, main = "0.001", col = "#C7BF3C", xlab = "sMLH")
+
+IR_0.01_hist = ~hist(IR_df$IR_0.01, main = "0.01", col = "#266D73", xlab = "IR")
+IR_0.001_hist = ~hist(IR_df$IR_0.001, main = "0.001", col = "#C7BF3C", xlab = "IR")
+
+HL_0.01_hist = ~hist(HL_df$HL_0.01, main = "0.01", col = "#266D73", xlab = "HL")
+HL_0.001_hist = ~hist(HL_df$HL_0.001, main = "0.001", col = "#C7BF3C", xlab = "HL")
+
+plot_grid(F_0.01_hist, F_0.001_hist,
+          sMLH_0.01_hist, sMLH_0.001_hist,
+          IR_0.01_hist, IR_0.001_hist,
+          HL_0.01_hist, HL_0.001_hist,
+          nrow = 4, ncol = 2,
+          labels = c("A", "B", "C", "D", "E", "F", "G", "H"), label_size = 12)
+# close file
+dev.off()
+```
+
+## Read depth vs. heterozygosity
+
+Next I will plot sample mean read depth vs. inbreeding coefficients to elucidate whether heterozygosity is correlated to the sequencing read depth.  
+  
+First, extract mean read depth per sample data from gstacks.log.distribs files:
+```
+#--- make output directory ---#
+mkdir ~/projects/def-frasiert/beluga-ddRAD/log-extracts/read-depth
+
+#--- capture read depth (coverage) data from the gstacks.log.distribs files ---#
+cd ~/projects/def-frasiert/beluga-ddRAD/stacks-output/with-RD-filter/gt0.01
+head -n 329 gstacks.log.distribs | tail -n 160 \
+  > ~/projects/def-frasiert/beluga-ddRAD/log-extracts/read-depth/0.01_read-depth
+
+cd ~/projects/def-frasiert/beluga-ddRAD/stacks-output/with-RD-filter/gt0.001
+head -n 329 gstacks.log.distribs | tail -n 160 \
+  > ~/projects/def-frasiert/beluga-ddRAD/log-extracts/read-depth/0.001_read-depth
+```
+scp files to my computer from the cluster.  
+  
+Import read depth data:
+```{r import read depth data}
+# import mean read depth per sample data (read depth does not change based on alpha values)
+# I have included the data for 0.001 separately to verify they are the same mean coverage values
+read_depth = read_delim("read-depth-stats/0.01_read-depth")
+read_depth_0.001 = read_delim("read-depth-stats/0.001_read-depth")
+comparedf(read_depth, read_depth_0.001)
+
+# remove replicate samples
+read_depth = read_depth %>% filter(sample != "Bel00470R_FRA2297A19-2", 
+                                   sample != "Bel00595R_FRA2297A22-6",
+                                   sample != "Bel00711R_FRA2297A22-7",
+                                   sample != "Bel00743R_FRA2297A17-8",
+                                   sample != "Bel01211R_FRA2297A4-3")
+
+# shorten sample names to just Bel numbers
+read_depth$sample = substr(read_depth$sample, 1, 8)
+```
+
+Plot read depth vs. heterozygosity:
+```{r plot read depth vs. heterozygosity}
+# create a data frame for plot data
+## first create a combined df of F values with shortened sampled names
+F_df = data.frame(sample = substr(F_0.01$INDV, 1, 8), F_0.01 = F_0.01$F, F_0.001 = F_0.001$F)
+## join dfs
+genetic_data = read_depth %>% select(sample, n_loci, mean_cov) %>%
+                              inner_join(F_df, by = join_by(sample)) %>%
+                              inner_join(sMLH_df, by = join_by(sample == sample)) %>%
+                              inner_join(IR_df, by = join_by(sample == sample)) %>%
+                              inner_join(HL_df, by = join_by(sample == sample))
+
+# save df to a table
+write.table(genetic_data, file = "inbreeding-coefficients/inbreed_coefficients.tsv", sep = "\t", row.names = FALSE)
+
+# plot
+FvsRD_0.01 = ggplot(data = genetic_data, aes(x = mean_cov, y = F_0.01)) +
+             geom_point() +
+             geom_smooth(colour = "#266D73", fill = "#266D73") +
+             theme_bw() +
+             theme(text = element_text(size = 12,  family = "sans"),
+                   axis.title.x = element_text(margin = margin(t = 7)),
+                   axis.title.y = element_text(vjust = 2)) +
+            labs(x = "Mean Read Depth", y = "F")
+
+FvsRD_0.001 = ggplot(data = genetic_data, aes(x = mean_cov, y = F_0.001)) +
+              geom_point() +
+              geom_smooth(colour = "#C7BF3C", fill = "#C7BF3C") +
+              theme_bw() +
+              theme(text = element_text(size = 12,  family = "sans"),
+                    axis.title.x = element_text(margin = margin(t = 7)),
+                    axis.title.y = element_text(vjust = 2)) +
+             labs(x = "Mean Read Depth", y = "F")
+
+sMLHvsRD_0.01 = ggplot(data = genetic_data, aes(x = mean_cov, y = sMLH_0.01)) +
+                geom_point() +
+                geom_smooth(colour = "#266D73", fill = "#266D73") +
+                theme_bw() +
+                theme(text = element_text(size = 12,  family = "sans"),
+                      axis.title.x = element_text(margin = margin(t = 7)),
+                      axis.title.y = element_text(vjust = 2)) +
+                labs(x = "Mean Read Depth", y = "sMLH")
+
+sMLHvsRD_0.001 = ggplot(data = genetic_data, aes(x = mean_cov, y = sMLH_0.001)) +
+                 geom_point() +
+                 geom_smooth(colour = "#C7BF3C", fill = "#C7BF3C") +
+                 theme_bw() +
+                 theme(text = element_text(size = 12,  family = "sans"),
+                       axis.title.x = element_text(margin = margin(t = 7)),
+                       axis.title.y = element_text(vjust = 2)) +
+                 labs(x = "Mean Read Depth", y = "sMLH")
+
+IRvsRD_0.01 = ggplot(data = genetic_data, aes(x = mean_cov, y = IR_0.01)) +
+              geom_point() +
+              geom_smooth(colour = "#266D73", fill = "#266D73") +
+              theme_bw() +
+              theme(text = element_text(size = 12,  family = "sans"),
+                    axis.title.x = element_text(margin = margin(t = 7)),
+                    axis.title.y = element_text(vjust = 2)) +
+              labs(x = "Mean Read Depth", y = "IR")
+
+IRvsRD_0.001 = ggplot(data = genetic_data, aes(x = mean_cov, y = IR_0.001)) +
+               geom_point() +
+               geom_smooth(colour = "#C7BF3C", fill = "#C7BF3C") +
+               theme_bw() +
+               theme(text = element_text(size = 12,  family = "sans"),
+                     axis.title.x = element_text(margin = margin(t = 7)),
+                     axis.title.y = element_text(vjust = 2)) +
+               labs(x = "Mean Read Depth", y = "IR")
+
+HLvsRD_0.01 = ggplot(data = genetic_data, aes(x = mean_cov, y = HL_0.01)) +
+              geom_point() +
+              geom_smooth(colour = "#266D73", fill = "#266D73") +
+              theme_bw() +
+              theme(text = element_text(size = 12,  family = "sans"),
+                    axis.title.x = element_text(margin = margin(t = 7)),
+                    axis.title.y = element_text(vjust = 2)) +
+              labs(x = "Mean Read Depth", y = "HL")
+
+HLvsRD_0.001 = ggplot(data = genetic_data, aes(x = mean_cov, y = HL_0.001)) +
+               geom_point() +
+               geom_smooth(colour = "#C7BF3C", fill = "#C7BF3C") +
+               theme_bw() +
+               theme(text = element_text(size = 12,  family = "sans"),
+                     axis.title.x = element_text(margin = margin(t = 7)),
+                     axis.title.y = element_text(vjust = 2)) +
+               labs(x = "Mean Read Depth", y = "HL")
+
+# organize plots into a grid
+pdf("plots/RDvsHet-plots.pdf", width = 10, height = 16)
+
+plot_grid(FvsRD_0.01, FvsRD_0.001,
+          sMLHvsRD_0.01, sMLHvsRD_0.001,
+          IRvsRD_0.01, IRvsRD_0.001,
+          HLvsRD_0.01, HLvsRD_0.001,
+          nrow = 4, ncol = 2,
+          labels = "AUTO", label_size = 12)
+
+dev.off()
+
+# make a grid of only 0.001 plots
+pdf("plots/0.001-RDvsHet-plots.pdf", width = 10, height = 8)
+
+plot_grid(FvsRD_0.001, sMLHvsRD_0.001,
+          IRvsRD_0.001, HLvsRD_0.001,
+          nrow = 2, ncol = 2,
+          labels = "AUTO", label_size = 12)
+
+dev.off()
+```
+
+## Inbreeding coefficient correlation plots
+
+Plots of correlation between the different inbreeding coefficients:
+```{r coefficient correlation plots}
+IRvsF_0.01 = ggplot(data = genetic_data, aes(x = IR_0.01, y = F_0.01)) +
+                    geom_point() +
+                    geom_smooth(method = "lm", colour = "#266D73", fill = "#266D73") +
+                    theme_bw() +
+                    theme(text = element_text(size = 12,  family = "sans"),
+                          axis.title.x = element_text(margin = margin(t = 7)),
+                          axis.title.y = element_text(vjust = 2)) +
+                    labs(x = "Internal relatedness (IR)", y = "F")
+IRvsF_0.01
+
+IRvsF_0.001 = ggplot(data = genetic_data, aes(x = IR_0.001, y = F_0.001)) +
+                     geom_point() +
+                     geom_smooth(method = "lm", colour = "#C7BF3C", fill = "#C7BF3C") +
+                     theme_bw() +
+                     theme(text = element_text(size = 12,  family = "sans"),
+                           axis.title.x = element_text(margin = margin(t = 7)),
+                           axis.title.y = element_text(vjust = 2)) +
+                     labs(x = "Internal relatedness (IR)", y = "F")
+IRvsF_0.001
+
+
+IRvssMLH_0.01 = ggplot(data = genetic_data, aes(x = IR_0.01, y = sMLH_0.01)) +
+                       geom_point() +
+                       geom_smooth(method = "lm", colour = "#266D73", fill = "#266D73") +
+                       theme_bw() +
+                       theme(text = element_text(size = 12,  family = "sans"),
+                             axis.title.x = element_text(margin = margin(t = 7)),
+                             axis.title.y = element_text(vjust = 2)) +
+                       labs(x = "Internal relatedness (IR)",
+                            y = expression(atop("Standardized multilocus heterozygosity", "(sMLH)")))
+IRvssMLH_0.01
+
+IRvssMLH_0.001 = ggplot(data = genetic_data, aes(x = IR_0.001, y = sMLH_0.001)) +
+                     geom_point() +
+                     geom_smooth(method = "lm", colour = "#C7BF3C", fill = "#C7BF3C") +
+                     theme_bw() +
+                     theme(text = element_text(size = 12,  family = "sans"),
+                           axis.title.x = element_text(margin = margin(t = 7)),
+                           axis.title.y = element_text(vjust = 2)) +
+                     labs(x = "Internal relatedness (IR)",
+                          y = expression(atop("Standardized multilocus heterozygosity", "(sMLH)")))
+IRvssMLH_0.001
+
+
+IRvsHL_0.01 = ggplot(data = genetic_data, aes(x = IR_0.01, y = HL_0.01)) +
+                       geom_point() +
+                       geom_smooth(method = "lm", colour = "#266D73", fill = "#266D73") +
+                       theme_bw() +
+                       theme(text = element_text(size = 12,  family = "sans"),
+                             axis.title.x = element_text(margin = margin(t = 7)),
+                             axis.title.y = element_text(vjust = 2)) +
+                       labs(x = "Internal relatedness (IR)",
+                            y = expression(atop("Homozygosity by locus", "(HL)")))
+IRvsHL_0.01
+
+IRvsHL_0.001 = ggplot(data = genetic_data, aes(x = IR_0.001, y = HL_0.001)) +
+                     geom_point() +
+                     geom_smooth(method = "lm", colour = "#C7BF3C", fill = "#C7BF3C") +
+                     theme_bw() +
+                     theme(text = element_text(size = 12,  family = "sans"),
+                           axis.title.x = element_text(margin = margin(t = 7)),
+                           axis.title.y = element_text(vjust = 2)) +
+                     labs(x = "Internal relatedness (IR)",
+                          y = "Homozygosity by locus (HL)")
+IRvsHL_0.001
+
+# save plots
+ggsave(plot = IRvsF_0.01, "plots/IRvsF_0.01.tiff", "tiff", width = 8.5, height = 5, units = "in")
+ggsave(plot = IRvsF_0.001, "plots/IRvsF_0.001.tiff", "tiff", width = 8.5, height = 5, units = "in")
+ggsave(plot = IRvssMLH_0.01, "plots/IRvssMLH_0.01.tiff", "tiff", width = 8.5, height = 5, units = "in")
+ggsave(plot = IRvssMLH_0.001, "plots/IRvssMLH_0.001.tiff", "tiff", width = 8.5, height = 5, units = "in")
+ggsave(plot = IRvsHL_0.01, "plots/IRvsHL_0.01.tiff", "tiff", width = 8.5, height = 5, units = "in")
+ggsave(plot = IRvsHL_0.001, "plots/IRvsHL_0.001.tiff", "tiff", width = 8.5, height = 5, units = "in")
+
+# organize plots into grid
+pdf("plots/coefficient-correlation-plots.pdf", width = 10, height = 12)
+
+plot_grid(IRvsF_0.01, IRvsF_0.001,
+          IRvssMLH_0.01, IRvssMLH_0.001,
+          IRvsHL_0.01, IRvsHL_0.001,
+          nrow = 3, ncol = 2,
+          labels = "AUTO", label_size = 12)
+
+dev.off()
+
+# make a grid of only 0.001 plots
+pdf("plots/0.001-coefficient-correlation-plots.pdf", width = 15, height = 4)
+
+plot_grid(IRvsF_0.001, IRvssMLH_0.001, IRvsHL_0.001,
+          nrow = 1, ncol = 3,
+          labels = "AUTO", label_size = 12)
+
+dev.off()
+```
+
+## Sample info plot
+
+Create a function to wrap long x-axis labels:
+```{r wrap x-axis label function}
+get_wrapper = function(width) {
+              function(x) {
+              lapply(strwrap(x, width = width, simplify = FALSE), paste, collapse="\n")
+              }
+}
+```
+
+Import the mortality data:
+```{r}
+mortality = read.csv("beluga-mortalities.csv") %>% select(lab_code, date_found, sex, estimated_age, category, broad_category)
+
+# filter mortality data set for just the individuals in the analysis
+mortality = subset(mortality, lab_code %in% genetic_data$sample)
+
+# create updated mortality classes
+mortality = mortality %>% mutate(new_category = case_when(
+            broad_category == "Dystocia / postpartum complication" ~ "Dystocia",
+            broad_category == "Antropogenic causes" ~ "Anthropogenic causes",
+            broad_category == "Neoplasia" ~ "Neoplasia",
+            broad_category == "Infectious" ~ "Infection",
+            category == "Degenerative changes" ~ "Degenerative changes",
+            category == "Undetermined" ~ "Undetermined",
+            broad_category == "Neonatal mortality" ~ "Neonatal mortality"))
+
+# create data frame for the live samples
+live_samples = data.frame(lab_code = c("Bel00100", "Bel00739", "Bel01064", "Bel01664", "Bel00854"),
+                          date_found = c(1995, 2009, 2014, 2022, 2000),
+                          sex = c("M", "M", "M", "F", "M"),
+                          estimated_age = NA,
+                          category = "Live biopsy",
+                          broad_category = "Live biopsy",
+                          new_category = "Live biopsy")
+
+# create a data frame that includes field info for both the dead and live samples
+field_data = rbind(mortality, live_samples)
+```
+
+Make a bar plot of sample counts and sex breakdown by mortality category:
+```{r sample info bar plot, fig.height=5, fig.width=8.5}
+sample_info_plot = ggplot(data = field_data, aes(factor(field_data$new_category))) +
+                   geom_bar(stat = "count", aes(fill = field_data$sex)) +
+                   theme_bw() +
+                   theme(text = element_text(size = 12,  family = "sans"),
+                         axis.title.x = element_text(margin = margin(t = 7)),
+                         axis.title.y = element_text(vjust = 2),
+                         legend.position = "bottom") +
+                   labs(x = "Cause of mortality", y = "Number of individuals") +
+                   scale_x_discrete(labels = get_wrapper(10)) +
+                   scale_fill_manual(values = c("goldenrod1", "#5E5EC7", "#1D3553"), name = "", labels = c("Female", "Male", "M-F")) +
+                   geom_text(aes(label = after_stat(count)), stat = "count", vjust = -0.25, colour = "black")
+sample_info_plot
+
+# save plot
+ggsave(plot = sample_info_plot, "plots/sample_info_plot.tiff", "tiff", width = 8.5, height = 5, units = "in")
+```
+
+## Cause of death vs. inbreeding coefficient
+
+Create a data frame for the cause of death plots:
+```{r mortality plot data}
+# create a data frame with sample name, cause of mortality, and inbreeding coefficients
+combined_data = genetic_data %>% inner_join(field_data, by = join_by(sample == lab_code))
+
+# reorder the new category factor to put live biopsy last
+combined_data$new_category = factor(combined_data$new_category, levels = c("Anthropogenic causes", "Degenerative changes", "Dystocia", "Infection", "Neonatal mortality",  "Neoplasia", "Undetermined", "Live biopsy"))
+```
+
+Box plot of IR vs. cause of mortality:
+```{r IR vs. COD box plot, fig.height=5, fig.width=8.5}
+# create a data frame to label the tops of bars
+n_label = combined_data %>% count(new_category)
+# add "n = " to the start of the labels
+n_label$n = paste("n =", n_label$n, sep = " ")
+
+# create a colour palette to highlight live biopsy samples in a different colour
+biopsy_colour = c("black", "black", "black", "black", "black", "black", "black", "#C7BF3C")
+# create a face palette to highlight live biopsy labels in bold
+biopsy_face = c("plain", "plain", "plain", "plain", "plain", "plain", "plain", "bold")
+
+# plot
+IR_boxplot_0.001 = ggplot(data = combined_data, aes(x = factor(new_category), y = IR_0.001)) +
+                   geom_boxplot(outlier.shape = NA) +
+                   geom_boxplot(data = combined_data[combined_data$new_category == "Live biopsy", ],
+                                outlier.shape = NA, aes(x = new_category, y = IR_0.001), colour = "#C7BF3C") +
+                   geom_jitter(alpha = 0.25, aes(colour = new_category), width = 0.25) +
+                   scale_color_manual(values = biopsy_colour) +
+                   theme_bw() +
+                   theme(text = element_text(size = 12,  family = "sans"),
+                         legend.position = "none",
+                         axis.title.x = element_text(margin = margin(t = 7)),
+                         axis.title.y = element_text(vjust = 2),
+                         axis.text.x = element_text(colour = biopsy_colour, face = biopsy_face,)) +
+                   labs(x = "Sample category", y = "Internal relatedness (IR)") +
+                   scale_x_discrete(labels = get_wrapper(10)) +
+                   annotate("text", x = n_label$new_category, y = 0.06,
+                            label = n_label$n,
+                            colour = biopsy_colour,
+                            fontface = c(1, 1, 1, 1, 1, 1, 1, 2), family = "sans")
+IR_boxplot_0.001
+
+# save plot
+ggsave(plot = IR_boxplot_0.001, "plots/IR_boxplot_0.001.tiff", "tiff", width = 8.5, height = 5, units = "in")
+
+# same plot, but with points shaped to indicate sex
+IR_boxplot_0.001_sex = ggplot(data = combined_data, aes(x = factor(new_category), y = IR_0.001)) +
+                       geom_boxplot(outlier.shape = NA) +
+                       geom_boxplot(data = combined_data[combined_data$new_category == "Live biopsy", ],
+                                    outlier.shape = NA, aes(x = new_category, y = IR_0.001), colour = "#C7BF3C") +
+                       geom_jitter(alpha = 0.25,
+                                   aes(colour = new_category, shape = sex, stroke = 1.5),
+                                   width = 0.25) +
+                       scale_color_manual(values = biopsy_colour, guide = "none") +
+                       scale_shape_discrete(labels = c("Female","Male", "M-F")) +
+                       theme_bw() +
+                       theme(text = element_text(size = 12,  family = "sans"),
+                             legend.position = "right",
+                             axis.title.x = element_text(margin = margin(t = 7)),
+                             axis.title.y = element_text(vjust = 2),
+                             axis.text.x = element_text(colour = biopsy_colour, face = biopsy_face,)) +
+                       labs(x = "Sample category", y = "Internal relatedness (IR)", shape = "", legend) +
+                       scale_x_discrete(labels = get_wrapper(10)) +
+                       annotate("text", x = n_label$new_category, y = 0.06,
+                                label = n_label$n,
+                                colour = biopsy_colour,
+                                fontface = c(1, 1, 1, 1, 1, 1, 1, 2), family = "sans") +
+                       theme(legend.box.spacing = unit(0, "pt"),
+                             legend.margin = unit(0, "mm"),
+                             legend.spacing.x = unit(0, 'mm'))
+
+IR_boxplot_0.001_sex
+
+# save plot
+ggsave(plot = IR_boxplot_0.001_sex, "plots/IR_boxplot_0.001_sex.tiff", "tiff", width = 8.5, height = 5, units = "in")
+```
+
+Box plot of sMLH vs. cause of mortality:
+```{r sMLH vs. COD box plot, fig.height=5, fig.width=8.5}
+sMLH_boxplot_0.001 = ggplot(data = combined_data, aes(x = factor(new_category), y = sMLH_0.001)) +
+                     geom_boxplot(outlier.shape = NA) +
+                     geom_boxplot(data = combined_data[combined_data$new_category == "Live biopsy", ],
+                                  outlier.shape = NA, aes(x = new_category, y = sMLH_0.001), colour = "#C7BF3C") +
+                     geom_jitter(alpha = 0.25, aes(colour = new_category), width = 0.25) +
+                     scale_color_manual(values = biopsy_colour) +
+                     theme_bw() +
+                     theme(text = element_text(size = 12,  family = "sans"),
+                           legend.position = "none",
+                           axis.title.x = element_text(margin = margin(t = 7)),
+                           axis.title.y = element_text(vjust = 2),
+                           axis.text.x = element_text(colour = biopsy_colour, face = biopsy_face,)) +
+                     labs(x = "Sample category",
+                          y = expression(atop("Standardized multilocus heterozygosity", "(sMLH)"))) +
+                     scale_x_discrete(labels = get_wrapper(10)) +
+                     annotate("text", x = n_label$new_category, y = 1.29,
+                              label = n_label$n,
+                              colour = biopsy_colour,
+                              fontface = c(1, 1, 1, 1, 1, 1, 1, 2), family = "sans")
+sMLH_boxplot_0.001
+
+# save plot
+ggsave(plot = sMLH_boxplot_0.001, "plots/sMLH_boxplot_0.001.tiff", "tiff", width = 8.5, height = 5, units = "in")
+```
+
+Box plot of HL vs. cause of mortality:
+```{r HL vs. COD box plot, fig.height=5, fig.width=8.5}
+HL_boxplot_0.001 = ggplot(data = combined_data, aes(x = factor(new_category), y = HL_0.001)) +
+                   geom_boxplot(outlier.shape = NA) +
+                   geom_boxplot(data = combined_data[combined_data$new_category == "Live biopsy", ],
+                                outlier.shape = NA, aes(x = new_category, y = HL_0.001), colour = "#C7BF3C") +
+                   geom_jitter(alpha = 0.25, aes(colour = new_category), width = 0.25) +
+                   scale_color_manual(values = biopsy_colour) +
+                   theme_bw() +
+                   theme(text = element_text(size = 12,  family = "sans"),
+                         legend.position = "none",
+                         axis.title.x = element_text(margin = margin(t = 7)),
+                         axis.title.y = element_text(vjust = 2),
+                         axis.text.x = element_text(colour = biopsy_colour, face = biopsy_face,)) +
+                   labs(x = "Sample category", y = "Homozygosity by locus (HL)") +
+                   scale_x_discrete(labels = get_wrapper(10)) +
+                   annotate("text", x = n_label$new_category, y = 0.677,
+                            label = n_label$n,
+                            colour = biopsy_colour,
+                            fontface = c(1, 1, 1, 1, 1, 1, 1, 2), family = "sans")
+HL_boxplot_0.001
+
+# save plot
+ggsave(plot = HL_boxplot_0.001, "plots/HL_boxplot_0.001.tiff", "tiff", width = 8.5, height = 5, units = "in")
+```
+## Age vs.inbreeding coefficient
+
+```{r age vs. inbreeding plots, fig.height=5, fig.width=8.5}
+# plot age vs. IR using the 0.001 dataset
+age_vs_IR_0.001 = ggplot(data = (combined_data %>% filter(new_category != "Live biopsy")),
+                         aes(x = estimated_age, y = IR_0.001)) +
+                  geom_point() +
+                  geom_smooth(method = "lm", colour = "#C7BF3C", fill = "#C7BF3C") +
+                  theme_bw() +
+                  theme(text = element_text(size = 12,  family = "sans"),
+                        axis.title.x = element_text(margin = margin(t = 7)),
+                        axis.title.y = element_text(vjust = 2))+
+                  labs(x = "Age (years)", y = "Internal relatedness (IR)")
+age_vs_IR_0.001
+
+# plot age vs. sMLH using the 0.001 dataset
+age_vs_sMLH_0.001 = ggplot(data = (combined_data %>% filter(new_category != "Live biopsy")),
+                         aes(x = estimated_age, y = sMLH_0.001)) +
+                  geom_point() +
+                  geom_smooth(method = "lm", colour = "#C7BF3C", fill = "#C7BF3C") +
+                  theme_bw() +
+                  theme(text = element_text(size = 12,  family = "sans"),
+                        axis.title.x = element_text(margin = margin(t = 7)),
+                        axis.title.y = element_text(vjust = 2))+
+                  labs(x = "Age (years)", y = expression(atop("Standardized multilocus heterozygosity", "(sMLH)")))
+age_vs_sMLH_0.001
+
+# plot age vs. HL using the 0.001 dataset
+age_vs_HL_0.001 = ggplot(data = (combined_data %>% filter(new_category != "Live biopsy")),
+                         aes(x = estimated_age, y = HL_0.001)) +
+                  geom_point() +
+                  geom_smooth(method = "lm", colour = "#C7BF3C", fill = "#C7BF3C") +
+                  theme_bw() +
+                  theme(text = element_text(size = 12,  family = "sans"),
+                        axis.title.x = element_text(margin = margin(t = 7)),
+                        axis.title.y = element_text(vjust = 2))+
+                  labs(x = "Age (years)", y = "Homozygosity by locus (HL)")
+age_vs_HL_0.001
+
+# save plots
+ggsave(plot = age_vs_IR_0.001, "plots/age_vs_IR_0.001.tiff", "tiff", width = 8.5, height = 5, units = "in")
+ggsave(plot = age_vs_sMLH_0.001, "plots/age_vs_sMLH_0.001.tiff", "tiff", width = 8.5, height = 5, units = "in")
+ggsave(plot = age_vs_HL_0.001, "plots/age_vs_HL_0.001.tiff", "tiff", width = 8.5, height = 5, units = "in")
+```
+
+# 3. Statistical analyses
+
+## Comparison of 0.01 and 0.001 datasets
+
+I want to test whether the resulting inbreeding coefficients differ significantly between the 0.01 and 0.001 datasets. I therefore want to perform a paired test.  
+  
+I need to assess normality of the differences between the datasets in order to determine if I should use a parametric or nonparametric test:
+```{r normality test}
+sMLH_differences = genetic_data$sMLH_0.01-genetic_data$sMLH_0.001
+hist(sMLH_differences)
+shapiro.test(sMLH_differences)
+
+IR_differences = genetic_data$IR_0.01-genetic_data$IR_0.001
+hist(IR_differences)
+shapiro.test(IR_differences)
+
+HL_differences = genetic_data$HL_0.01-genetic_data$HL_0.001
+hist(HL_differences)
+shapiro.test(HL_differences)
+```
+
+Given that neither these data sets (see earlier histograms of the inbreeding coefficients) nor the measured differences are normally distributed, I will perform a non-parametric paired sample test: the Wilcoxon signed-rank test. In this test, the null hypothesis is that the observations are exchangeable/the difference between the paired observations is zero. 
+
+```{r wilcoxon signed-rank test 0.01 vs 0.001}
+# for F
+wilcox.test(x = genetic_data$F_0.01, y = genetic_data$F_0.001, paired = TRUE)
+
+# for sMLH
+wilcox.test(x = genetic_data$sMLH_0.01, y = genetic_data$sMLH_0.001, paired = TRUE)
+
+# for IR
+wilcox.test(x = genetic_data$IR_0.01, y = genetic_data$IR_0.001, paired = TRUE)
+
+# for HL
+wilcox.test(x = genetic_data$HL_0.01, y = genetic_data$HL_0.001, paired = TRUE)
+```
+Thus, where p-value is < 0.05 we have reason to reject the null hypothesis: the 0.01 dataset and the 0.001 dataset are significantly different for IR or HL but not for F and sMLH. Moving forward, I will present values for the more stringent dataset, 0.001, since it allows for higher confidence in the resulting genotype calls.  
+  
+Despite this, upon visual observation, it does not appear that the chosen alpha values influence the biological interpretation of the resulting inbreeding coefficients (i.e., we still do not find much variance in inbreeding coefficients in the sample set, and individuals are generally "not inbred"). 
+
+## Bayesian analysis of effect of inbreeding on COD
+
+### DAG
+
+Create a DAG (directed acyclic graph), a causal Bayesian network, to understand potential paths of bias in causal analyses:
+```{r DAG}
+dag = dagitty( "dag {
+mortality_cause <- sex -> contaminant_load
+sex -> contaminant_load <- age
+contaminant_load <- age -> mortality_cause
+contaminant_load -> mortality_cause
+inbreeding -> mortality_cause
+}")
+
+plot(dag)
+
+# determine what to adjust for
+adjustmentSets(dag, exposure = "contaminant_load", outcome = "mortality_cause")
+```
+
+When assessing effect of contaminant load on mortality, need to control for both age and sex.
+
+### Organize the data for Bayesian models
+
+I will transform the nominal predicted variable (cause of death) and the nominal predictor variable (sex) to numeric values.  
+  
+I will standardize the metric predictors (age and inbreeding coefficient).
+
+```{r data standardization}
+# generate a subset of the data that excludes the 5 live biopsy samples
+stan_data = combined_data %>% filter(new_category != "Live biopsy")
+
+# nominal predicted variable
+cause_numeric = as.numeric(stan_data$new_category) 
+cause_names = levels(stan_data$new_category)
+n_causes = length(cause_names)
+N = length(cause_numeric)
+
+# nominal predictor variable
+sex_numeric = as.numeric(as.factor(stan_data$sex))
+sex_names = levels(as.factor(stan_data$sex))
+n_sexes = length(sex_names)
+
+# prepare and standardize metric predictor variables
+## age
+age = as.numeric(stan_data$estimated_age)
+age_mean = mean(age, na.rm = TRUE)
+age_SD = sd(age, na.rm = TRUE)
+zAge = (age - age_mean) / age_SD
+## inbreeding coefficient, IR
+internal_relatedness = stan_data$IR_0.001
+IR_mean = mean(internal_relatedness)
+IR_SD = sd(internal_relatedness)
+zIR = (internal_relatedness - IR_mean) / IR_SD
+```
+
+Stan is a software for Bayesian data analysis, and CmdStanR is an interface for Stan in R.  
+  
+Create a data list for Stan:
+```{r stan data list}
+data_list = list(
+            N = N,
+            n_causes = n_causes,
+            n_sexes = n_sexes,
+            cause = cause_numeric,
+            sex = sex_numeric,
+            inbreeding = zIR
+            )
+```
+
+### Build models **without** interaction
+
+#### Effect of internal relatedness (IR) on cause of mortality
+
+Define the model and write a string for Stan:
+```{r define stan model - IR vs COD}
+stan_model_IR = write_stan_file("
+data {
+      int<lower=0> N;            // sample size
+      int<lower=0> n_causes;     // number of causes of mortality
+      array[N] int cause;        // indices of cause of mortality
+      vector[N] inbreeding;      // vector of inbreeding data
+     }
+
+parameters {
+            vector[n_causes] b0;           
+            vector[n_causes] b1; // effect of IR on each cause of mortality
+           }
+
+model {
+       // Likelihood
+       for (i in 1:N) {
+       cause[i] ~ categorical_logit(b0 + (b1 * inbreeding[i]));
+       }
+ 
+       // Priors
+       for (j in 1:n_causes) {
+       b0[j] ~ normal(0, 2);
+       b1[j] ~ normal(0, 2);
+       }
+      }
+")
+```
+
+Compile and run the model:
+```{r run stan model - IR vs COD}
+# translate the model to C++ and compile
+IR_model_C = cmdstan_model(stan_file = stan_model_IR)
+
+# run the model
+fit_model_IR = IR_model_C$sample(data = data_list,
+                                       chains = 3,
+                                       parallel_chains = 3,
+                                       refresh = 1000,
+                                       iter_warmup = 2000,
+                                       iter_sampling = 10000
+)
+
+# run model diagnostics
+fit_model_IR$cmdstan_diagnose()
+
+# print diagnostics
+print(fit_model_IR)
+
+# plot results
+posteriors_stan_IR = as_draws_array(fit_model_IR$draws())
+mcmc_intervals(posteriors_stan_IR, pars = c("b0[1]", "b0[2]", "b0[3]", "b0[4]", "b0[5]", "b0[6]", "b0[7]"))
+mcmc_intervals(posteriors_stan_IR, pars = c("b1[1]", "b1[2]", "b1[3]", "b1[4]", "b1[5]", "b1[6]", "b1[7]"))
+
+# plot traceplots
+mcmc_trace(fit_model_IR$draws(), pars = c("b1[1]", "b1[2]", "b1[3]", "b1[4]", "b1[5]", "b1[6]", "b1[7]"),
+           n_warmup = 2000)
+```
+
+Extract the data and plot posteriors:
+```{r plot posteriors IR vs COD, fig.height=5, fig.width=8.5}
+# extract the data
+posteriors_IR = data.frame(as_draws_df(fit_model_IR$draws()))
+
+chain_length = length(posteriors_IR[, 1])
+
+head(posteriors_IR)
+
+b1_IR = matrix(NA, nrow = chain_length, ncol = n_causes)
+
+for (i in 1:n_causes) {
+  b1_IR[, i] = posteriors_IR[, paste("b1.", i, ".", sep = "")]
+}
+
+# plot effects of inbreeding on COD
+
+## organize the data
+values_IR = c(b1_IR[, 1], b1_IR[, 2], b1_IR[, 3], b1_IR[, 4], b1_IR[, 5], b1_IR[, 6], b1_IR[, 7])
+
+causes = c(rep(cause_names[1], times = chain_length),
+           rep(cause_names[2], times = chain_length),
+           rep(cause_names[3], times = chain_length),
+           rep(cause_names[4], times = chain_length),
+           rep(cause_names[5], times = chain_length),
+           rep(cause_names[6], times = chain_length),
+           rep(cause_names[7], times = chain_length))
+
+model_data_IR = data.frame(values_IR, causes)
+
+## plot
+ggplot(model_data_IR) +
+       theme_bw() +
+       geom_density_ridges(aes(x = values_IR, y = causes), fill = "#2F7F86", alpha = 0.3) +
+       xlab("Log odds") +
+       ggtitle("Effect of internal relatedness (IR)") +
+       ylab("Cause of mortality") +
+       scale_y_discrete(limits = rev, expand = expansion(add = c(0.4, 2))) 
+```
+
+Extract the mean and 95% HDI for each mortality category:
+```{r IR vs COD means and HDIs}
+# anthropogenic causes
+mean(posteriors_IR$b1.1.)
+quantile(posteriors_IR$b1.1., probs = 0.025)
+quantile(posteriors_IR$b1.1., probs = 0.975)
+
+# degenerative changes
+mean(posteriors_IR$b1.1.)
+quantile(posteriors_IR$b1.2., probs = 0.025)
+quantile(posteriors_IR$b1.2., probs = 0.975)
+
+# dystocia
+mean(posteriors_IR$b1.1.)
+quantile(posteriors_IR$b1.3., probs = 0.025)
+quantile(posteriors_IR$b1.3., probs = 0.975)
+
+# infection
+mean(posteriors_IR$b1.2.)
+quantile(posteriors_IR$b1.4., probs = 0.025)
+quantile(posteriors_IR$b1.4., probs = 0.975)
+
+# neonatal mortality
+mean(posteriors_IR$b1.3.)
+quantile(posteriors_IR$b1.5., probs = 0.025)
+quantile(posteriors_IR$b1.5., probs = 0.975)
+
+# neoplasia
+mean(posteriors_IR$b1.4.)
+quantile(posteriors_IR$b1.6., probs = 0.025)
+quantile(posteriors_IR$b1.6., probs = 0.975)
+
+# undetermined
+mean(posteriors_IR$b1.5.)
+quantile(posteriors_IR$b1.7., probs = 0.025)
+quantile(posteriors_IR$b1.7., probs = 0.975)
+```
+
+
+
+
+
+
+Model for prior and posterior predictive checks.
+```{r}
+stan_model1.1 = write_stan_file("
+  data {
+    int<lower=0> N;         // Sample size
+    int<lower=0> nCauses;   // Number of causes of mortality
+    int cause[N];           // Indices of cause of mortality
+    vector[N] inbreeding;   // Vector of inbreeding data
+  }
+
+  parameters {
+    vector[nCauses] b0;           
+    vector[nCauses] b1;     // Effect of inbreeding coefficient on each cause of mortality
+  }
+
+  model {
+    // Likelihood
+    for (i in 1:N) {
+      cause[i] ~ categorical_logit(b0 + (b1 * inbreeding[i]));
+    }
+
+    // Priors
+    for (j in 1:nCauses) {
+      b0[j] ~ normal(0, 2);
+      b1[j] ~ normal(0, 2);
+    }
+  }
+  
+  generated quantities {
+    ////////////////////////////
+    // PRIOR PREDICTIVE CHECK //
+    ////////////////////////////
+    real b0prior;
+    real b1prior;
+    real priorPred[N];
+    
+    // Priors
+    b0prior = normal_rng(0, 2);
+    b1prior = normal_rng(0, 2);
+    
+    // Likelihood
+    for (i in 1:N) {
+      priorPred[i] = categorical_logit_rng(b0 + (b1 * inbreeding[i]));
+    }
+    
+    ////////////////////////////////
+    // POSTERIOR PREDICTIVE CHECK //
+    ////////////////////////////////
+    real postPred[N];
+    
+    // Likelihood
+    for (i in 1:N) {
+      postPred[i] = categorical_logit_rng(b0 + (b1 * inbreeding[i]));
+    }
+  }
+")
+
+#############################
+# COMPILE AND RUN THE MODEL #
+#############################
+
+# translate the model to C++ and compile
+model_stan1.1 = cmdstan_model(stan_file = stan_model1.1)
+
+# Run the model
+fit_model1.1 = model_stan1.1$sample(data = dataList,
+                               chains = 3,
+                               parallel_chains = 3,
+                               refresh = 1000,
+                               iter_warmup = 2000,
+                               iter_sampling = 10000
+)
+```
+
+
+```{r}
+#-------------------------#
+# Extract the data        #
+#-------------------------#
+posteriors1.1 = data.frame(as_draws_df(fit_model1.1$draws()))
+chainLength = length(posteriors1.1[, 1])
+head(posteriors1.1)
+
+#--- Separate out priorPred ---#
+priorPred1.1 = matrix(NA, ncol = N, nrow = chainLength)
+for (i in 1:N) {
+  priorPred1.1[, i] = posteriors1.1[, paste("priorPred.", i, ".", sep = "")]
+}
+
+#-----------------------------------------------------------#
+#    Plot the distributions of the number of individuals    #
+#    assigned to each cause of death and compare to that   #
+#    observed.                                              #
+#-----------------------------------------------------------#
+
+levels = c(1:5) # all unique values in df
+predCauses1.1 <- sapply(levels, function(x)rowSums(priorPred1.1 == x)) # count occurrences of x in each row
+colnames(predCauses1.1) <- levels
+predCauses1.1
+
+#--- Use table function to get observed counts ---#
+obsCause = as.numeric(table(cause))
+
+#--- Plot histogram of predicted values and observed ---#
+par(mfrow = c(2, 2))
+
+# Birth Complications
+hist(predCauses1.1[, 1], main = "Birth Complications", xlab = "")
+abline(v = obsCause[1], lty = "dashed", lwd = 2, col = "red")
+
+# Cancer
+hist(predCauses1.1[, 2], main = "Cancer", xlab = "")
+abline(v = obsCause[2], lty = "dashed", lwd = 2, col = "red")
+
+# Infection
+hist(predCauses1.1[, 3], main = "Infection", xlab = "")
+abline(v = obsCause[3], lty = "dashed", lwd = 2, col = "red")
+
+# Trauma
+hist(predCauses1.1[, 4], main = "Trauma", xlab = "")
+abline(v = obsCause[4], lty = "dashed", lwd = 2, col = "red")
+
+# Unknown
+hist(predCauses1.1[, 5], main = "Unknown", xlab = "")
+abline(v = obsCause[5], lty = "dashed", lwd = 2, col = "red")
+
+
+#---------------------------------#
+#   Posterior Predictive Check    #
+#---------------------------------#
+
+#--- Separate out postPred ---#
+postPred1.1 = matrix(NA, ncol = N, nrow = chainLength)
+for (i in 1:N) {
+  postPred1.1[, i] = posteriors1.1[, paste("postPred.", i, ".", sep = "")]
+}
+
+#--- Take a subset of 25 individuals ---#
+testers = round(seq(from = 1, to = N, length = 25))
+
+#--- Get these columns from the posteriors ---#
+testPred = postPred1.1[, testers]
+
+#--- Get mean and 90% HDI for each ---#
+testMean = apply(testPred, 2, mean)
+testLow  = apply(testPred, 2, quantile, probs = 0.01)
+testHigh = apply(testPred, 2, quantile, probs = 0.90)
+
+#--- Get observed value for each tested individual ---#
+obsTest = cause[testers]
+
+#--- Make the plot ---#
+par(mfrow = c(1, 1))
+individuals = 1:25
+dotchart(testMean, labels = individuals, xlim = c(0.5, 5.5))
+segments(x0 = testLow, y0 = individuals, x1 = testHigh, y1 = individuals)
+points(x = obsTest, y = individuals, pch = 16, col = rgb(1, 0, 0, 0.6))
+```
+
+Further evaluate priors by plotting with posteriors.
+```{r}
+# Note that priors were for   #
+# the STANDARDIZED data, and  #
+# therefore should be         #
+# compared with the           #
+# standardized posteriors     #
+# (i.e., not on the original  #
+# scale).                     #
+
+
+#--- b0 ---#
+# Generate priors
+b0Prior = rnorm(n = chainLength, mean = 0, sd = 2)
+
+# Organize data, plotting priors vs. posteriors for carcinoma as cause of death as test
+b0values = c(b0Prior, posteriorsINBRED$b0.1.)
+b0labels = c(rep("Prior", times = chainLength), rep("Posterior", times = chainLength))
+datab0 = data.frame(b0values, b0labels)
+
+# Plot data
+ggplot(datab0) +
+  theme_bw() +
+  geom_density(aes(x = b0values, fill = b0labels), alpha = 0.6)
+
+
+#--- b1 ---#
+# Generate priors
+b1Prior = rnorm(n = chainLength, mean = 0, sd = 2)
+
+# Organize data
+b1values = c(b1Prior, posteriorsINBRED$b1.1.)
+b1labels = c(rep("Prior", times = chainLength), rep("Posterior", times = chainLength))
+datab1 = data.frame(b1values, b1labels)
+
+# Plot data
+ggplot(datab1) +
+  theme_bw() +
+  geom_density(aes(x = b1values, fill = b1labels), alpha = 0.6)
+```
+
+
+
+
+pairwise Fst comparison in belugas and regions that stand out
