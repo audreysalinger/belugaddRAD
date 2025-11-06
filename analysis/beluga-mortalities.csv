@@ -1,0 +1,430 @@
+lab_code,mortality_id,field_code,smu_format,pathology_num,date_found,site,sex,estimated_age,length_cm,weight_kg,preservation_code,category,broad_category,cancer,digestive_cancer,mammary_cancer
+Bel00280,124,DL2000-01,DL-01-00,00-B006,22-07-2000,"Trois-Pistoles (au large)",F,11,353,316,3,"Dystocia / postpartum complication","Dystocia / postpartum complication",0,0,0
+Bel01353,124,DL2000-01,DL-01-00,00-B006,22-07-2000,"Trois-Pistoles (au large)",F,11,353,316,3,"Dystocia / postpartum complication","Dystocia / postpartum complication",0,0,0
+Bel00316,129,DL2001-01,DL-01-01,01-5794,18-04-2001,Pointe-au-Père,M,48,440,1226,3,"Verminous bronchopneumonia",Infectious,0,0,0
+Bel00317,129,DL2001-01,DL-01-01,01-5794,18-04-2001,Pointe-au-Père,M,48,440,1226,3,"Verminous bronchopneumonia",Infectious,0,0,0
+Bel00318,129,DL2001-01,DL-01-01,01-5794,18-04-2001,Pointe-au-Père,M,48,440,1226,3,"Verminous bronchopneumonia",Infectious,0,0,0
+Bel00366,136,DL2002-01,DL-01-02,02-5218,07-04-2002,Saint-Irénée,F,56,376,698,3,Neoplasia,Neoplasia,1,1,1
+Bel00367,136,DL2002-01,DL-01-02,02-5218,07-04-2002,Saint-Irénée,F,56,376,698,3,Neoplasia,Neoplasia,1,1,1
+Bel00368,136,DL2002-01,DL-01-02,02-5218,07-04-2002,Saint-Irénée,F,56,376,698,3,Neoplasia,Neoplasia,1,1,1
+Bel00405,145,DL2003-01,DL-01-03,03-3597,22-05-2003,Sainte-Flavie,M,36,413,965,4,Trauma,"Antropogenic causes",0,0,0
+Bel00406,145,DL2003-01,DL-01-03,03-3597,22-05-2003,Sainte-Flavie,M,36,413,965,4,Trauma,"Antropogenic causes",0,0,0
+Bel00459,153,DL2004-01,DL-01-04,04-4908,10-05-2004,Sainte-Luce,F,12,334,655,3,Toxoplasmosis,Infectious,0,0,0
+Bel00460,153,DL2004-01,DL-01-04,04-4908,10-05-2004,Sainte-Luce,F,12,334,655,3,Toxoplasmosis,Infectious,0,0,0
+Bel00505,163,DL2005-01,DL-01-05,05-5811,13-05-2005,Saint-Ulric,M,38,420,992,3,Undetermined,Undetermined,0,0,0
+Bel00506,163,DL2005-01,DL-01-05,05-5811,13-05-2005,Saint-Ulric,M,38,420,992,3,Undetermined,Undetermined,0,0,0
+Bel00859,169,DL2006-01,DL-01-06,06-7004,11-07-2006,Pointe-au-Père,M,55,436,903,3.5,Neoplasia,Neoplasia,1,1,0
+Bel01341,169,DL2006-01,DL-01-06,06-7004,11-07-2006,Pointe-au-Père,M,55,436,903,3.5,Neoplasia,Neoplasia,1,1,0
+Bel00572,172,DL2007-01,DL-01-07,07-5120,23-05-2007,Bergeronnes,M,58,422,1042,3.5,"Degenerative changes","Other non-infetious causes",0,0,0
+Bel00573,172,DL2007-01,DL-01-07,07-5120,23-05-2007,Bergeronnes,M,58,422,1042,3.5,"Degenerative changes","Other non-infetious causes",0,0,0
+Bel00633,182,DL2008-01,DL-01-08,08-2238,03-05-2008,Rivière-Ouelle,M,21,428,961,3.5,Other,"Other non-infetious causes",0,0,0
+Bel00634,182,DL2008-01,DL-01-08,08-2238,03-05-2008,Rivière-Ouelle,M,21,428,961,3.5,Other,"Other non-infetious causes",0,0,0
+Bel00710,189,DL2009-01,DL-01-09,P194-09,16-06-2009,Sainte-Luce,F,12,325,425,2,"Degenerative changes","Other non-infetious causes",0,0,0
+Bel00741,194,DL2010-01,DL-01-10,P460-10,09-03-2010,Saint-Ulric,F,2,229,206,2,"Verminous bronchopneumonia",Infectious,0,0,0
+Bel00742,194,DL2010-01,DL-01-10,P460-10,09-03-2010,Saint-Ulric,F,2,229,206,2,"Verminous bronchopneumonia",Infectious,0,0,0
+Bel00812,205,DL2011-01,DL-01-11,P1081-11,07-04-2011,Sainte-Flavie,M,2,231,145,2.5,Trauma,"Antropogenic causes",0,0,0
+Bel00813,205,DL2011-01,DL-01-11,P1081-11,07-04-2011,Sainte-Flavie,M,2,231,145,2.5,Trauma,"Antropogenic causes",0,0,0
+Bel00003,22,DL1987-01,DL-01-87,87-2823,1987-07-03,Sainte-Luce,F,37,344,662,2.5,Undetermined,Undetermined,0,0,0
+Bel01352,25,DL1988-01,DL-01-88,88-2642,1988-05-29,Sainte-Flavie,M,6,315,461,2.5,Undetermined,Undetermined,0,0,0
+Bel00030,35,DL1989-01,DL-01-89,89-2057,1989-04-26,Sainte-Flavie,M,45,402,1039,3,Undetermined,Undetermined,0,0,0
+Bel00049,43,DL1990-01,DL-01-90,90-1773,1990-04-08,"Bic Baie-des-Roses",M,46,417,1220,2.5,Neoplasia,Neoplasia,1,1,0
+Bel00060,49,DL1991-01,DL-01-91,91-2978,1991-06-08,Kamouraska,F,35,375,663,2,"Verminous gastro-enteritis / peritonitis",Infectious,0,0,0
+Bel00081,71,DL1994-01,DL-01-94,94-3834,1994-05-24,Tadoussac,M,60,456,1285,2,Neoplasia,Neoplasia,1,0,0
+Bel00090,78,DL1995-01,DL-01-95,95-3963,1995-05-14,Saint-Fabien-sur-Mer,F,53,370,437,2,"Primary starvation","Primary starvation",0,0,0
+Bel00122,90,DL1996-01,DL-01-96,96-2833,1996-04-10,"Les Escoumins",M,42,427,996,2,"Infectious - bacterial",Infectious,0,0,0
+Bel00154,99,DL1997-01,DL-01-97,97-4579,1997-05-03,Rivière-Ouelle,M,16,396,931,3,Undetermined,Undetermined,0,0,0
+Bel00155,99,DL1997-01,DL-01-97,97-4579,1997-05-03,Rivière-Ouelle,M,16,396,931,3,Undetermined,Undetermined,0,0,0
+Bel00191,106,DL1998-01,DL-01-98,98-1966,1998-03-06,Sainte-Flavie,F,5,277,381,2,"Verminous bronchopneumonia",Infectious,0,0,0
+Bel00192,106,DL1998-01,DL-01-98,98-1966,1998-03-06,Sainte-Flavie,F,5,277,381,2,"Verminous bronchopneumonia",Infectious,0,0,0
+Bel00237,115,DL1999-01,DL-01-99,99-4438,08-04-1999,Sainte-Flavie,M,35,402,821,2.5,Toxoplasmosis,Infectious,0,0,0
+Bel00281,125,DL2000-02,DL-02-00,00-B201,26-07-2000,Tadoussac,F,9,316,284,3.5,"Dystocia / postpartum complication","Dystocia / postpartum complication",0,0,0
+Bel00282,125,DL2000-02,DL-02-00,00-B201,26-07-2000,Tadoussac,F,9,316,284,3.5,"Dystocia / postpartum complication","Dystocia / postpartum complication",0,0,0
+Bel00283,125,DL2000-02,DL-02-00,00-B201,26-07-2000,Tadoussac,F,9,316,284,3.5,"Dystocia / postpartum complication","Dystocia / postpartum complication",0,0,0
+Bel00319,130,DL2001-02,DL-02-01,01-6755,04-05-2001,"Sainte-Thérèse du Cap Colombier",F,61,375,678,3,Neoplasia,Neoplasia,1,0,0
+Bel00320,130,DL2001-02,DL-02-01,01-6755,04-05-2001,"Sainte-Thérèse du Cap Colombier",F,61,375,678,3,Neoplasia,Neoplasia,1,0,0
+Bel00369,137,DL2002-02,DL-02-02,02-6827,06-05-2002,Rivière-Ouelle,M,21,401,933,3.5,Undetermined,Undetermined,0,0,0
+Bel00370,137,DL2002-02,DL-02-02,02-6827,06-05-2002,Rivière-Ouelle,M,21,401,933,3.5,Undetermined,Undetermined,0,0,0
+Bel00371,137,DL2002-02,DL-02-02,02-6827,06-05-2002,Rivière-Ouelle,M,21,401,933,3.5,Undetermined,Undetermined,0,0,0
+Bel00372,137,DL2002-02,DL-02-02,02-6827,06-05-2002,Rivière-Ouelle,M,21,401,933,3.5,Undetermined,Undetermined,0,0,0
+Bel00407,146,DL2003-02,DL-02-03,"03-4383 ",13-06-2003,Saint-Ulric,F,45,356,576,2,Neoplasia,Neoplasia,1,1,0
+Bel00408,146,DL2003-02,DL-02-03,"03-4383 ",13-06-2003,Saint-Ulric,F,45,356,576,2,Neoplasia,Neoplasia,1,1,0
+Bel00461,154,DL2004-02,DL-02-04,04-5819,04-06-2004,Port-au-Persil,F,60,347,658,3,Neoplasia,Neoplasia,1,0,0
+Bel00507,164,DL2005-02,DL-02-05,05-6700,02-06-2005,Sainte-Luce,F,35,377,795,3.5,"Verminous gastro-enteritis / peritonitis",Infectious,0,0,0
+Bel00508,164,DL2005-02,DL-02-05,05-6700,02-06-2005,Sainte-Luce,F,35,377,795,3.5,"Verminous gastro-enteritis / peritonitis",Infectious,0,0,0
+Bel00530,170,DL2006-02,DL-02-06,06-9186,17-09-2006,Pointe-au-Père,F,4,262,317,2.5,Other,"Other non-infetious causes",0,0,0
+Bel00531,170,DL2006-02,DL-02-06,06-9186,17-09-2006,Pointe-au-Père,F,4,262,317,2.5,Other,"Other non-infetious causes",0,0,0
+Bel00532,170,DL2006-02,DL-02-06,06-9186,17-09-2006,Pointe-au-Père,F,4,262,317,2.5,Other,"Other non-infetious causes",0,0,0
+Bel00533,170,DL2006-02,DL-02-06,06-9186,17-09-2006,Pointe-au-Père,F,4,262,317,2.5,Other,"Other non-infetious causes",0,0,0
+Bel00574,173,DL2007-02,DL-02-07,07-5160,27-05-2007,Sainte-Luce,F,44,397,716,2,Undetermined,Undetermined,0,0,0
+Bel00575,173,DL2007-02,DL-02-07,07-5160,27-05-2007,Sainte-Luce,F,44,397,716,2,Undetermined,Undetermined,0,0,0
+Bel00635,183,DL2008-02,DL-02-08,08-2699,07-06-2008,Portneuf-sur-Mer,F,37,370,645,3.5,Neoplasia,Neoplasia,1,1,0
+Bel00636,183,DL2008-02,DL-02-08,08-2699,07-06-2008,Portneuf-sur-Mer,F,37,370,645,3.5,Neoplasia,Neoplasia,1,1,0
+Bel00711,190,DL2009-02,DL-02-09,P507-09,29-07-2009,Tadoussac,M,1,196,124,2.5,"Infectious - undetermined",Infectious,0,0,0
+Bel00712,190,DL2009-02,DL-02-09,P507-09,29-07-2009,Tadoussac,M,1,196,124,2.5,"Infectious - undetermined",Infectious,0,0,0
+Bel00743,195,DL2010-02,DL-02-10,P855-10,21-03-2010,Sainte-Félicité,F,1,209,141,2,"Verminous bronchopneumonia",Infectious,0,0,0
+Bel00744,195,DL2010-02,DL-02-10,P855-10,21-03-2010,Sainte-Félicité,F,1,209,141,2,"Verminous bronchopneumonia",Infectious,0,0,0
+Bel00814,206,DL2011-02,DL-02-11,P908-11,19-05-2011,Rimouski,F,44,365,839,2,"Dystocia / postpartum complication","Dystocia / postpartum complication",0,0,0
+Bel00815,206,DL2011-02,DL-02-11,P908-11,19-05-2011,Rimouski,F,44,365,839,2,"Dystocia / postpartum complication","Dystocia / postpartum complication",0,0,0
+Bel00004,23,DL1987-02,DL-02-87,87-3682,1987-09-02,Matane,F,16,373,836,3,"Infectious - bacterial",Infectious,0,0,0
+Bel00031,36,DL1989-02,DL-02-89,89-2629,1989-05-30,Sainte-Flavie,M-F,57,414,1059,2,Undetermined,Undetermined,0,0,0
+Bel00032,36,DL1989-02,DL-02-89,89-2629,1989-05-30,Sainte-Flavie,M-F,57,414,1059,2,Undetermined,Undetermined,0,0,0
+Bel00033,36,DL1989-02,DL-02-89,89-2629,1989-05-30,Sainte-Flavie,M-F,57,414,1059,2,Undetermined,Undetermined,0,0,0
+Bel01478,36,DL1989-02,DL-02-89,89-2629,1989-05-30,Sainte-Flavie,M-F,57,414,1059,2,Undetermined,Undetermined,0,0,0
+Bel00050,44,DL1990-02,DL-02-90,90-2961,1990-06-16,"Bic Île-au-Massacre",M,56,424,1082,2.5,Undetermined,Undetermined,0,0,0
+Bel00061,50,DL1991-02,DL-02-91,91-4196,1991-08-24,Saint-Andre-de-Kamouraska,F,54,347,572,2,"Infectious - bacterial",Infectious,0,0,0
+Bel00066,56,DL1992-02,DL-02-92,92-4426,1992-07-03,Métis-sur-mer,M,51,397,905,2,"Verminous bronchopneumonia",Infectious,0,0,0
+Bel00067,56,DL1992-02,DL-02-92,92-4426,1992-07-03,Métis-sur-mer,M,51,397,905,2,"Verminous bronchopneumonia",Infectious,0,0,0
+Bel00070,63,DL1993-02,DL-02-93,93-3616,1993-05-20,Ruisseau-Castor,M,47,397,0,2.5,Neoplasia,Neoplasia,1,0,0
+Bel00091,79,DL1995-02,DL-02-95,95-4138,1995-05-21,Rivière-Ouelle,F,50,331,583,2,Neoplasia,Neoplasia,1,1,0
+Bel00123,91,DL1996-02,DL-02-96,96-3971,1996-05-16,Kamouraska,F,9,325,304,3,"Verminous bronchopneumonia",Infectious,0,0,0
+Bel00156,100,DL1997-02,DL-02-97,97-5351,1997-05-23,Île-aux-Lièvres,F,57,338,614,2,Undetermined,Undetermined,0,0,0
+Bel00157,100,DL1997-02,DL-02-97,97-5351,1997-05-23,Île-aux-Lièvres,F,57,338,614,2,Undetermined,Undetermined,0,0,0
+Bel00193,107,DL1998-02,DL-02-98,98-5138,1998-05-23,Sainte-Flavie,M,26,401,711,2,"Infectious - bacterial",Infectious,0,0,0
+Bel00194,107,DL1998-02,DL-02-98,98-5138,1998-05-23,Sainte-Flavie,M,26,401,711,2,"Infectious - bacterial",Infectious,0,0,0
+Bel00238,116,DL1999-02,DL-02-99,99-5107,24-04-1999,Métis-sur-Mer,M,38,416,1005,3.5,"Infectious - bacterial",Infectious,0,0,0
+Bel00284,126,DL2000-03,DL-03-00,00-B348,29-07-2000,"Les Escoumins (au large)",M,35,411,0,3,Undetermined,Undetermined,0,0,0
+Bel00285,126,DL2000-03,DL-03-00,00-B348,29-07-2000,"Les Escoumins (au large)",M,35,411,0,3,Undetermined,Undetermined,0,0,0
+Bel00321,131,DL2001-03,DL-03-01,01-9185,22-06-2001,Cap-Chat,M,48,418,1173,3.5,Undetermined,Undetermined,0,0,0
+Bel00322,131,DL2001-03,DL-03-01,01-9185,22-06-2001,Cap-Chat,M,48,418,1173,3.5,Undetermined,Undetermined,0,0,0
+Bel00323,131,DL2001-03,DL-03-01,01-9185,22-06-2001,Cap-Chat,M,48,418,1173,3.5,Undetermined,Undetermined,0,0,0
+Bel00324,131,DL2001-03,DL-03-01,01-9185,22-06-2001,Cap-Chat,M,48,418,1173,3.5,Undetermined,Undetermined,0,0,0
+Bel00373,138,DL2002-03,DL-03-02,02-8743,14-06-2002,Matane,M,21,433,1191,3.5,"Verminous gastro-enteritis / peritonitis",Infectious,0,0,0
+Bel00374,138,DL2002-03,DL-03-02,02-8743,14-06-2002,Matane,M,21,433,1191,3.5,"Verminous gastro-enteritis / peritonitis",Infectious,0,0,0
+Bel00409,147,DL2003-03,DL-03-03,03-5664,23-07-2003,"Île Verte",M,0,153,69,2,"Neonatal mortality","Neonatal mortality",0,0,0
+Bel00410,147,DL2003-03,DL-03-03,03-5664,23-07-2003,"Île Verte",M,0,153,69,2,"Neonatal mortality","Neonatal mortality",0,0,0
+Bel00462,155,DL2004-03,DL-03-04,04-6091,11-06-2004,Rimouski,F,56,330,525,2.5,Neoplasia,Neoplasia,1,1,0
+Bel00463,155,DL2004-03,DL-03-04,04-6091,11-06-2004,Rimouski,F,56,330,525,2.5,Neoplasia,Neoplasia,1,1,0
+Bel00509,165,DL2005-03,DL-03-05,05-8914,04-08-2005,Pointe-au-Père,F,48,362,629,3,Neoplasia,Neoplasia,1,1,1
+Bel00510,165,DL2005-03,DL-03-05,05-8914,04-08-2005,Pointe-au-Père,F,48,362,629,3,Neoplasia,Neoplasia,1,1,1
+Bel00534,171,DL2006-03,DL-03-06,06-9446,21-06-2006,Tadoussac,F,35,391,905,4,"Dystocia / postpartum complication","Dystocia / postpartum complication",0,0,0
+Bel00535,171,DL2006-03,DL-03-06,06-9446,21-06-2006,Tadoussac,F,35,391,905,4,"Dystocia / postpartum complication","Dystocia / postpartum complication",0,0,0
+Bel00536,171,DL2006-03,DL-03-06,06-9446,21-06-2006,Tadoussac,F,35,391,905,4,"Dystocia / postpartum complication","Dystocia / postpartum complication",0,0,0
+Bel00537,171,DL2006-03,DL-03-06,06-9446,21-06-2006,Tadoussac,F,35,391,905,4,"Dystocia / postpartum complication","Dystocia / postpartum complication",0,0,0
+Bel00576,174,DL2007-03,DL-03-07,07-6401,01-07-2007,"Île Verte",F,50,374,680,3,Neoplasia,Neoplasia,1,1,1
+Bel00577,174,DL2007-03,DL-03-07,07-6401,01-07-2007,"Île Verte",F,50,374,680,3,Neoplasia,Neoplasia,1,1,1
+Bel00578,174,DL2007-03,DL-03-07,07-6401,01-07-2007,"Île Verte",F,50,374,680,3,Neoplasia,Neoplasia,1,1,1
+Bel00579,174,DL2007-03,DL-03-07,07-6401,01-07-2007,"Île Verte",F,50,374,680,3,Neoplasia,Neoplasia,1,1,1
+Bel00637,184,DL2008-03,DL-03-08,08-2764,16-06-2008,Escoumins,F,52,370,603,2,"Primary starvation","Primary starvation",0,0,0
+Bel00638,184,DL2008-03,DL-03-08,08-2764,16-06-2008,Escoumins,F,52,370,603,2,"Primary starvation","Primary starvation",0,0,0
+Bel00713,191,DL2009-03,DL-03-09,P532-09,01-08-2009,Sainte-Flavie,M,49,414,867,3,"Protozoal pneumonia",Infectious,0,0,0
+Bel00714,191,DL2009-03,DL-03-09,P532-09,01-08-2009,Sainte-Flavie,M,49,414,867,3,"Protozoal pneumonia",Infectious,0,0,0
+Bel00745,196,DL2010-03,DL-03-10,P856-10,30-04-2010,Sainte-Luce,F,7,317,435,4,Other,"Other non-infetious causes",0,0,0
+Bel00746,196,DL2010-03,DL-03-10,P856-10,30-04-2010,Sainte-Luce,F,7,317,435,4,Other,"Other non-infetious causes",0,0,0
+Bel00816,207,DL2011-03,DL-03-11,P1047-11,08-06-2011,Matane,F,30,306,718,3,"Dystocia / postpartum complication","Dystocia / postpartum complication",0,0,0
+Bel00817,207,DL2011-03,DL-03-11,P1047-11,08-06-2011,Matane,F,30,306,718,3,"Dystocia / postpartum complication","Dystocia / postpartum complication",0,0,0
+Bel00005,24,DL1987-03,DL-03-87,87-3898,1987-09-17,Pointe-au-Père,F,38,360,609,3,"Infectious - undetermined",Infectious,0,0,0
+Bel00034,37,DL1989-03,DL-03-89,89-2858,1989-06-13,Cacouna,F,45,360,0,2,"Dystocia / postpartum complication","Dystocia / postpartum complication",0,0,0
+Bel00051,45,DL1990-03,DL-03-90,90-3484,1990-07-19,Tourelle,M,39,438,1306,3,Undetermined,Undetermined,0,0,0
+Bel00052,51,DL1991-03,DL-03-91,91-4316,1991-08-25,"Île du Pot-à-l'Eau-de-Vie",M,45,394,0,3,Undetermined,Undetermined,0,0,0
+Bel00071,64,DL1993-03,DL-03-93,93-4278,1993-06-18,"Îles-du-Bic (au large)",M,18,0,0,3,Undetermined,Undetermined,0,0,0
+Bel00072,64,DL1993-03,DL-03-93,93-4278,1993-06-18,"Îles-du-Bic (au large)",M,18,0,0,3,Undetermined,Undetermined,0,0,0
+Bel00082,73,DL1994-03,DL-03-94,94-5102,1994-06-13,Sainte-Flavie,M,18,389,1006,3,"Degenerative changes","Other non-infetious causes",0,0,0
+Bel00092,80,DL1995-03,DL-03-95,95-4668,1995-05-30,Métis-sur-Mer,M,52,384,758,3,"Degenerative changes","Other non-infetious causes",0,0,0
+Bel00158,101,DL1997-03,DL-03-97,97-5837,1997-06-08,Rivière-Ouelle,F,43,363,841,2,"Infectious - bacterial",Infectious,0,0,0
+Bel00159,101,DL1997-03,DL-03-97,97-5837,1997-06-08,Rivière-Ouelle,F,43,363,841,2,"Infectious - bacterial",Infectious,0,0,0
+Bel00195,108,DL1998-03,DL-03-98,98-5151,1998-05-24,"Riviere-du-Loup (Anse au Persil)",F,59,377,916,2,Neoplasia,Neoplasia,1,1,1
+Bel00196,108,DL1998-03,DL-03-98,98-5151,1998-05-24,"Riviere-du-Loup (Anse au Persil)",F,59,377,916,2,Neoplasia,Neoplasia,1,1,1
+Bel00239,117,DL1999-03,DL-03-99,99-6797,31-05-1999,Ile-aux-Lièvres,F,54,366,832,4,Undetermined,Undetermined,0,0,0
+Bel00286,127,DL2000-04,DL-04-00,00-E914,06-10-2000,"Les Escoumins",F,0,372,605,2.5,Other,"Other non-infetious causes",0,0,0
+Bel00287,127,DL2000-04,DL-04-00,00-E914,06-10-2000,"Les Escoumins",F,0,372,605,2.5,Other,"Other non-infetious causes",0,0,0
+Bel00325,132,DL2001-04,DL-04-01,01-A836,28-07-2001,"Île au Caribou Côte Nord",M,60,410,1189,3.5,"Verminous gastro-enteritis / peritonitis",Infectious,0,0,0
+Bel00326,132,DL2001-04,DL-04-01,01-A836,28-07-2001,"Île au Caribou Côte Nord",M,60,410,1189,3.5,"Verminous gastro-enteritis / peritonitis",Infectious,0,0,0
+Bel00327,132,DL2001-04,DL-04-01,01-A836,28-07-2001,"Île au Caribou Côte Nord",M,60,410,1189,3.5,"Verminous gastro-enteritis / peritonitis",Infectious,0,0,0
+Bel00328,132,DL2001-04,DL-04-01,01-A836,28-07-2001,"Île au Caribou Côte Nord",M,60,410,1189,3.5,"Verminous gastro-enteritis / peritonitis",Infectious,0,0,0
+Bel00375,139,DL2002-04,DL-04-02,02-A383,24-07-2002,Sainte-Flavie,M,55,411,1130,4,Trauma,"Antropogenic causes",0,0,0
+Bel00376,139,DL2002-04,DL-04-02,02-A383,24-07-2002,Sainte-Flavie,M,55,411,1130,4,Trauma,"Antropogenic causes",0,0,0
+Bel00411,148,DL2003-04,DL-04-03,03-5932,30-07-2003,Sainte-Luce,F,0,144,42,1->2,"Neonatal mortality","Neonatal mortality",0,0,0
+Bel00412,148,DL2003-04,DL-04-03,03-5932,30-07-2003,Sainte-Luce,F,0,144,42,1->2,"Neonatal mortality","Neonatal mortality",0,0,0
+Bel00413,148,DL2003-04,DL-04-03,03-5932,30-07-2003,Sainte-Luce,F,0,144,42,1->2,"Neonatal mortality","Neonatal mortality",0,0,0
+Bel00464,156,DL2004-04,DL-04-04,04-6285,19-06-2004,Rivière-Ouelle,M,3,233,216,2.5,"Verminous bronchopneumonia",Infectious,0,0,0
+Bel00465,156,DL2004-04,DL-04-04,04-6285,19-06-2004,Rivière-Ouelle,M,3,233,216,2.5,"Verminous bronchopneumonia",Infectious,0,0,0
+Bel00511,166,DL2005-04,DL-04-05,05-A025,04-09-2005,Baie-des-Sables,M,50,418,912,2.5,"Verminous bronchopneumonia",Infectious,0,0,0
+Bel00512,166,DL2005-04,DL-04-05,05-A025,04-09-2005,Baie-des-Sables,M,50,418,912,2.5,"Verminous bronchopneumonia",Infectious,0,0,0
+Bel00580,175,DL2007-04,DL-04-07,07-6402,03-07-2007,Anse-Pleureuse,F,28,380,841,3.5,"Dystocia / postpartum complication","Dystocia / postpartum complication",0,0,0
+Bel00581,175,DL2007-04,DL-04-07,07-6402,03-07-2007,Anse-Pleureuse,F,28,380,841,3.5,"Dystocia / postpartum complication","Dystocia / postpartum complication",0,0,0
+Bel00582,175,DL2007-04,DL-04-07,07-6402,03-07-2007,Anse-Pleureuse,F,28,380,841,3.5,"Dystocia / postpartum complication","Dystocia / postpartum complication",0,0,0
+Bel00583,175,DL2007-04,DL-04-07,07-6402,03-07-2007,Anse-Pleureuse,F,28,380,841,3.5,"Dystocia / postpartum complication","Dystocia / postpartum complication",0,0,0
+Bel00639,185,DL2008-04,DL-04-08,09-1364,18-07-2008,Rivière-du-Loup,F,0,169,64,4,"Neonatal mortality","Neonatal mortality",0,0,0
+Bel00640,185,DL2008-04,DL-04-08,09-1364,18-07-2008,Rivière-du-Loup,F,0,169,64,4,"Neonatal mortality","Neonatal mortality",0,0,0
+Bel00715,192,DL2009-04,DL-04-09,P782-09,03-09-2009,Matane,M,0,165,63,2,"Fishing gear","Antropogenic causes",0,0,0
+Bel00716,192,DL2009-04,DL-04-09,P782-09,03-09-2009,Matane,M,0,165,63,2,"Fishing gear","Antropogenic causes",0,0,0
+Bel00747,197,DL2010-04,DL-04-10,"P1132-10 ",09-06-2010,Sainte-Luce,F,42,369,762,3.5,Toxoplasmosis,Infectious,0,0,0
+Bel00748,197,DL2010-04,DL-04-10,"P1132-10 ",09-06-2010,Sainte-Luce,F,42,369,762,3.5,Toxoplasmosis,Infectious,0,0,0
+Bel00818,208,DL2011-04,DL-04-11,P1247-11,12-07-2011,Percé,F,56,361,466,2,Neoplasia,Neoplasia,1,1,0
+Bel00819,208,DL2011-04,DL-04-11,P1247-11,12-07-2011,Percé,F,56,361,466,2,Neoplasia,Neoplasia,1,1,0
+Bel00001,7,DL1984-04,DL-04-84,84-2633,1984-06-24,Grand-Metis,F,36,374,0,2,"Dystocia / postpartum complication","Dystocia / postpartum complication",0,0,0
+Bel00013,26,DL1988-04,DL-04-88,88-3306,1988-07-15,Pointe-au-Père,F,42,362,583,2,"Protozoal pneumonia",Infectious,1,0,0
+Bel00014,26,DL1988-04,DL-04-88,88-3306,1988-07-15,Pointe-au-Père,F,42,362,583,2,"Protozoal pneumonia",Infectious,1,0,0
+Bel00035,38,DL1989-04,DL-04-89,89-2859,1989-06-13,"Rivière-du-Loup (au large)",F,40,335,614,2,Undetermined,Undetermined,0,0,0
+Bel00053,46,DL1990-04,DL-04-90,90-3654,1990-07-29,Île-aux-Lièvres,F,25,329,709,2,Undetermined,Undetermined,0,0,0
+Bel00062,52,DL1991-04,DL-04-91,91-4295,1991-08-30,Forestville,M,0,155,59,1->2,"Neonatal mortality","Neonatal mortality",0,0,0
+Bel00068,58,DL1992-04,DL-04-92,92-5675,1992-09-02,Cap-Bon-Désir,M,3,247,224,3,Undetermined,Undetermined,0,0,0
+Bel00073,65,DL1993-04,DL-04-93,93-4742,1993-07-07,"Cap-Bon-Désir (au large)",F,14,341,721,3,Undetermined,Undetermined,0,0,0
+Bel00074,65,DL1993-04,DL-04-93,93-4742,1993-07-07,"Cap-Bon-Désir (au large)",F,14,341,721,3,Undetermined,Undetermined,0,0,0
+Bel00083,74,DL1994-04,DL-04-94,94-7002,1994-09-23,Saint-Joachim-de-Tourelles,F,14,339,388,2.5,"Verminous bronchopneumonia",Infectious,0,0,0
+Bel00093,81,DL1995-04,DL-04-95,95-4887,1995-06-17,Notre-Dame-du-Portage,F,3,240,269,3,"Verminous bronchopneumonia",Infectious,0,0,0
+Bel00124,93,DL1996-04,DL-04-96,96-5738,1996-07-22,Bic,M-F,34,420,868,2,"Infectious - bacterial",Infectious,0,0,0
+Bel00160,102,DL1997-04,DL-04-97,97-6568,1997-07-01,Bic,M,0,139,43,1->2,"Neonatal mortality","Neonatal mortality",0,0,0
+Bel00161,102,DL1997-04,DL-04-97,97-6568,1997-07-01,Bic,M,0,139,43,1->2,"Neonatal mortality","Neonatal mortality",0,0,0
+Bel00197,109,DL1998-04,DL-04-98,98-5165,1998-05-24,Sainte-Flavie,F,42,356,534,2,Neoplasia,Neoplasia,1,1,1
+Bel00198,109,DL1998-04,DL-04-98,98-5165,1998-05-24,Sainte-Flavie,F,42,356,534,2,Neoplasia,Neoplasia,1,1,1
+Bel00240,118,DL1999-04,DL-04-99,99-7116,07-06-1999,"Trois-Pistoles (au large)",M,35,398,985,3,Neoplasia,Neoplasia,1,1,0
+Bel00288,128,DL2000-05,DL-05-00,00-F152,12-10-2000,Cacouna,F,50,401,803,2,Neoplasia,Neoplasia,1,1,1
+Bel00329,133,DL2001-05,DL-05-01,01-D757,25-09-2001,"Île Verte",M,7,298,342,2.5,"Infectious - bacterial",Infectious,0,0,0
+Bel00330,133,DL2001-05,DL-05-01,01-D757,25-09-2001,"Île Verte",M,7,298,342,2.5,"Infectious - bacterial",Infectious,0,0,0
+Bel00331,133,DL2001-05,DL-05-01,01-D757,25-09-2001,"Île Verte",M,7,298,342,2.5,"Infectious - bacterial",Infectious,0,0,0
+Bel00377,140,DL2002-05,DL-05-02,02-A462,25-07-2002,"Île Saint-Barnabé (au large)",F,27,371,988,2,"Dystocia / postpartum complication","Dystocia / postpartum complication",0,0,0
+Bel00378,140,DL2002-05,DL-05-02,02-A462,25-07-2002,"Île Saint-Barnabé (au large)",F,27,371,988,2,"Dystocia / postpartum complication","Dystocia / postpartum complication",0,0,0
+Bel00379,140,DL2002-05,DL-05-02,02-A462,25-07-2002,"Île Saint-Barnabé (au large)",F,27,371,988,2,"Dystocia / postpartum complication","Dystocia / postpartum complication",0,0,0
+Bel00380,140,DL2002-05,DL-05-02,02-A462,25-07-2002,"Île Saint-Barnabé (au large)",F,27,371,988,2,"Dystocia / postpartum complication","Dystocia / postpartum complication",0,0,0
+Bel00414,149,DL2003-05,DL-05-03,03-6368,12-08-2003,"Baie-des-Ha!-Ha! Bic",M,0,418,918,3,"Infectious - bacterial",Infectious,0,0,0
+Bel00415,149,DL2003-05,DL-05-03,03-6368,12-08-2003,"Baie-des-Ha!-Ha! Bic",M,0,418,918,3,"Infectious - bacterial",Infectious,0,0,0
+Bel00466,157,DL2004-05,DL-05-04,04-7674,30-07-2004,Saint-Ulric,M,12,416,853,3.5,Undetermined,Undetermined,0,0,0
+Bel00467,157,DL2004-05,DL-05-04,04-7674,30-07-2004,Saint-Ulric,M,12,416,853,3.5,Undetermined,Undetermined,0,0,0
+Bel00513,167,DL2005-05,DL-05-05,05-A557,13-09-2005,"Les Escoumins",M,38,437,1207,3.5,"Fishing gear","Antropogenic causes",0,0,0
+Bel00514,167,DL2005-05,DL-05-05,05-A557,13-09-2005,"Les Escoumins",M,38,437,1207,3.5,"Fishing gear","Antropogenic causes",0,0,0
+Bel00584,176,DL2007-05,DL-05-07,08-3529,08-06-2007,Trois-Pistoles,M,0,148,46,2.5,"Neonatal mortality","Neonatal mortality",0,0,0
+Bel00585,176,DL2007-05,DL-05-07,08-3529,08-06-2007,Trois-Pistoles,M,0,148,46,2.5,"Neonatal mortality","Neonatal mortality",0,0,0
+Bel00717,193,DL2009-05,DL-05-09,P855-09,15-09-2009,Pointe-au-Père,F,48,358,728,2,Undetermined,Undetermined,0,0,0
+Bel00718,193,DL2009-05,DL-05-09,P855-09,15-09-2009,Pointe-au-Père,F,48,358,728,2,Undetermined,Undetermined,0,0,0
+Bel00749,198,DL2010-05,DL-05-10,P1141-10,10-06-2010,"Rimouski 48 25 46 N X 68 35 46 W",F,51,363,636,2.5,"Verminous gastro-enteritis / peritonitis",Infectious,0,0,0
+Bel00750,198,DL2010-05,DL-05-10,P1141-10,10-06-2010,"Rimouski 48 25 46 N X 68 35 46 W",F,51,363,636,2.5,"Verminous gastro-enteritis / peritonitis",Infectious,0,0,0
+Bel00820,209,DL2011-05,DL-05-11,P1426-11,09-08-2011,Métis-sur-Mer,F,14,356,795,2.5,"Dystocia / postpartum complication","Dystocia / postpartum complication",0,0,0
+Bel00821,209,DL2011-05,DL-05-11,P1426-11,09-08-2011,Métis-sur-Mer,F,14,356,795,2.5,"Dystocia / postpartum complication","Dystocia / postpartum complication",0,0,0
+Bel00036,39,DL1989-05,DL-05-89,89-3326,1989-07-13,Rivière-Ouelle,F,54,397,0,3,Undetermined,Undetermined,0,0,0
+Bel00054,47,DL1990-05,DL-05-90,90-4680,1990-09-30,"Île Verte",F,27,356,546,3,Undetermined,Undetermined,0,0,0
+Bel00069,59,DL1992-05,DL-05-92,92-6147,1992-09-24,Anse-au-Sable,F,42,337,0,2.5,Other,"Other non-infetious causes",0,0,0
+Bel00075,66,DL1993-05,DL-05-93,93-5719,1993-08-23,Sainte-Anne-des-Monts,M,7,270,313,3,"Verminous bronchopneumonia",Infectious,0,0,0
+Bel00084,75,DL1994-05,DL-05-94,94-7947,1994-10-28,Saint-Ulric,M,46,399,1025,2,"Verminous gastro-enteritis / peritonitis",Infectious,0,0,0
+Bel00094,82,DL1995-05,DL-05-95,95-5201,1995-06-30,Saint-Ulric,F,42,370,707,2.5,Trauma,"Antropogenic causes",0,0,0
+Bel00125,94,DL1996-05,DL-05-96,96-5794,1996-07-23,Saint-Joseph-de-la-Rive,F,38,346,483,3,Neoplasia,Neoplasia,1,0,0
+Bel00162,103,DL1997-05,DL-05-97,97-6984,1997-07-15,"Île Saint-Barnabé (au large)",M,12,378,744,2,"Infectious - bacterial",Infectious,0,0,0
+Bel00163,103,DL1997-05,DL-05-97,97-6984,1997-07-15,"Île Saint-Barnabé (au large)",M,12,378,744,2,"Infectious - bacterial",Infectious,0,0,0
+Bel00199,110,DL1998-05,DL-05-98,98-5615,02-06-1998,Saint-Denis-de-Kamouraska,M,2,239,251,3,Toxoplasmosis,Infectious,0,0,0
+Bel00200,110,DL1998-05,DL-05-98,98-5615,02-06-1998,Saint-Denis-de-Kamouraska,M,2,239,251,3,Toxoplasmosis,Infectious,0,0,0
+Bel00241,119,DL1999-05,DL-05-99,99-8302,05-07-1999,Saint-Ulric,F,30,357,516,2,Neoplasia,Neoplasia,1,1,0
+Bel00242,119,DL1999-05,DL-05-99,99-8302,05-07-1999,Saint-Ulric,F,30,357,516,2,Neoplasia,Neoplasia,1,1,0
+Bel00332,134,DL2001-06,DL-06-01,01-D923,02-10-2001,Pointe-au-Père,F,9,300,335,2,"Infectious - bacterial",Infectious,0,0,0
+Bel00333,134,DL2001-06,DL-06-01,01-D923,02-10-2001,Pointe-au-Père,F,9,300,335,2,"Infectious - bacterial",Infectious,0,0,0
+Bel00334,134,DL2001-06,DL-06-01,01-D923,02-10-2001,Pointe-au-Père,F,9,300,335,2,"Infectious - bacterial",Infectious,0,0,0
+Bel00381,141,DL2002-06,DL-06-02,02-B561,23-08-2002,Matane,F,8,303,413,2,"Verminous bronchopneumonia",Infectious,0,0,0
+Bel00382,141,DL2002-06,DL-06-02,02-B561,23-08-2002,Matane,F,8,303,413,2,"Verminous bronchopneumonia",Infectious,0,0,0
+Bel00416,150,DL2003-06,DL-06-03,03-8538,17-10-2003,Longue-Rive,F,52,383,587,2.5,Neoplasia,Neoplasia,1,1,0
+Bel00417,150,DL2003-06,DL-06-03,03-8538,17-10-2003,Longue-Rive,F,52,383,587,2.5,Neoplasia,Neoplasia,1,1,0
+Bel00468,158,DL2004-06,DL-06-04,04-9120,13-09-2004,Sainte-Flavie,F,8,326,316,2,"Verminous bronchopneumonia",Infectious,0,0,0
+Bel00469,158,DL2004-06,DL-06-04,04-9120,13-09-2004,Sainte-Flavie,F,8,326,316,2,"Verminous bronchopneumonia",Infectious,0,0,0
+Bel00515,168,DL2005-06,DL-06-05,05-A657,11-09-2005,"Baie des Ha!Ha! Saguenay",F,48,373,646,3.5,Undetermined,Undetermined,0,0,0
+Bel00516,168,DL2005-06,DL-06-05,05-A657,11-09-2005,"Baie des Ha!Ha! Saguenay",F,48,373,646,3.5,Undetermined,Undetermined,0,0,0
+Bel00586,177,DL2007-06,DL-06-07,07-7824,17-08-2007,Saint-Simon-sur-mer,F,55,366,741,3.5,Neoplasia,Neoplasia,1,1,1
+Bel00587,177,DL2007-06,DL-06-07,07-7824,17-08-2007,Saint-Simon-sur-mer,F,55,366,741,3.5,Neoplasia,Neoplasia,1,1,1
+Bel00751,199,DL2010-06,DL-06-10,P1368-10,16-07-2010,"Rimouski 48 37 5 N X 68 34 1 W",F,18,348,667,2.5,"Dystocia / postpartum complication","Dystocia / postpartum complication",0,0,0
+Bel00752,199,DL2010-06,DL-06-10,P1368-10,16-07-2010,"Rimouski 48 37 5 N X 68 34 1 W",F,18,348,667,2.5,"Dystocia / postpartum complication","Dystocia / postpartum complication",0,0,0
+Bel00822,210,DL2011-06,DL-06-11,P1639-11,10-09-2011,Matane,F,68,379,573,2,"Primary starvation","Primary starvation",0,0,0
+Bel00823,210,DL2011-06,DL-06-11,P1639-11,10-09-2011,Matane,F,68,379,573,2,"Primary starvation","Primary starvation",0,0,0
+Bel00002,8,DL1984-06,DL-06-84,84-2848,1984-08-16,Riviere-Madeleine,M,3,274,0,3,"Verminous bronchopneumonia",Infectious,0,0,0
+Bel00037,40,DL1989-06,DL-06-89,89-3809,1989-08-17,"Pointe-Boisvert (au large)",F,50,357,0,2,"Infectious - bacterial",Infectious,1,1,0
+Bel00055,48,DL1990-06,DL-06-90,90-4739,1990-10-03,Petit-Matane,M,49,413,842,2.5,Undetermined,Undetermined,0,0,0
+Bel00063,54,DL1991-06,DL-06-91,91-4642,1991-09-25,Grosses-Roches,M,49,430,1361,3,Undetermined,Undetermined,0,0,0
+Bel00076,67,DL1993-06,DL-06-93,93-5792,1993-08-26,"Les Éboulements",M,0,413,1090,2,Undetermined,Undetermined,0,0,0
+Bel00085,76,DL1994-06,DL-06-94,94-7976,1994-10-31,Pointe-au-Père,M,53,424,904,3,Undetermined,Undetermined,0,0,0
+Bel00126,95,DL1996-06,DL-06-96,96-6322,1996-08-11,Sainte-Luce,F,0,145,46,2,"Neonatal mortality","Neonatal mortality",0,0,0
+Bel00164,104,DL1997-06,DL-06-97,97-7479,1997-07-29,Sainte-Luce,F,62,385,693,2.5,Trauma,"Antropogenic causes",0,0,0
+Bel00201,111,DL1998-06,DL-06-98,98-7252,16-07-1998,Bic,F,18,388,1003,3,"Dystocia / postpartum complication","Dystocia / postpartum complication",0,0,0
+Bel00202,111,DL1998-06,DL-06-98,98-7252,16-07-1998,Bic,F,18,388,1003,3,"Dystocia / postpartum complication","Dystocia / postpartum complication",0,0,0
+Bel00243,120,DL1999-06,DL-06-99,99-9817,03-08-1999,"Matane (au large)",M,29,418,1181,3.5,Undetermined,Undetermined,0,0,0
+Bel00335,135,DL2001-07,DL-07-01,01-G438,18-11-2001,"Baie-des-Ha!-Ha! Bic",M,59,391,840,3.5,Undetermined,Undetermined,0,0,0
+Bel00336,135,DL2001-07,DL-07-01,01-G438,18-11-2001,"Baie-des-Ha!-Ha! Bic",M,59,391,840,3.5,Undetermined,Undetermined,0,0,0
+Bel00337,135,DL2001-07,DL-07-01,01-G438,18-11-2001,"Baie-des-Ha!-Ha! Bic",M,59,391,840,3.5,Undetermined,Undetermined,0,0,0
+Bel00383,142,DL2002-07,DL-07-02,02-B652,24-08-2002,"Île Saint-Barnabé",M,45,408,952,3,"Infectious - bacterial",Infectious,0,0,0
+Bel00418,151,DL2003-07,DL-07-03,03-8745,22-10-2003,Rimouski,F,30,310,373,2,Trauma,"Antropogenic causes",0,0,0
+Bel00419,151,DL2003-07,DL-07-03,03-8745,22-10-2003,Rimouski,F,30,310,373,2,Trauma,"Antropogenic causes",0,0,0
+Bel00588,159,DL2004-07,DL-07-04,04-9121,19-08-2004,"Les Méchins",F,0,161,51,2,"Neonatal mortality","Neonatal mortality",0,0,0
+Bel00589,178,DL2007-07,DL-07-07,07-8073,25-08-2007,Saint-Fabien-sur-mer,F,38,338,635,3,"Infectious - bacterial",Infectious,0,0,0
+Bel00590,178,DL2007-07,DL-07-07,07-8073,25-08-2007,Saint-Fabien-sur-mer,F,38,338,635,3,"Infectious - bacterial",Infectious,0,0,0
+Bel00591,178,DL2007-07,DL-07-07,07-8073,25-08-2007,Saint-Fabien-sur-mer,F,38,338,635,3,"Infectious - bacterial",Infectious,0,0,0
+Bel00592,178,DL2007-07,DL-07-07,07-8073,25-08-2007,Saint-Fabien-sur-mer,F,38,338,635,3,"Infectious - bacterial",Infectious,0,0,0
+Bel00641,188,DL2008-07,DL-07-08,08-3657,18-09-2008,Sainte-Flavie,F,57,382,610,2.5,"Primary starvation","Primary starvation",0,0,0
+Bel00642,188,DL2008-07,DL-07-08,08-3657,18-09-2008,Sainte-Flavie,F,57,382,610,2.5,"Primary starvation","Primary starvation",0,0,0
+Bel00753,200,DL2010-07,DL-07-10,P1448-10,31-07-2010,"Sainte-Flavie 48 38.326 N X 68 0.71 W",F,40,371,909,2,"Dystocia / postpartum complication","Dystocia / postpartum complication",0,0,0
+Bel00754,200,DL2010-07,DL-07-10,P1448-10,31-07-2010,"Sainte-Flavie 48 38.326 N X 68 0.71 W",F,40,371,909,2,"Dystocia / postpartum complication","Dystocia / postpartum complication",0,0,0
+Bel00824,211,DL2011-07,DL-07-11,P1836-11,09-10-2011,"La Martre",M,55,424,1017,4,Undetermined,Undetermined,0,0,0
+Bel00825,211,DL2011-07,DL-07-11,P1836-11,09-10-2011,"La Martre",M,55,424,1017,4,Undetermined,Undetermined,0,0,0
+Bel00016,27,DL1988-07,DL-07-88,88-3552,1988-08-02,Matane,M,39,402,781,2,"Infectious - bacterial",Infectious,0,0,0
+Bel00038,41,DL1989-07,DL-07-89,89-3883,1989-08-23,"Grandes-Bergeronnes (au large)",M,61,411,793,3,Neoplasia,Neoplasia,1,0,0
+Bel00077,68,DL1993-07,DL-07-93,93-6945,1993-10-13,Grandes-Bergeronnes,F,29,355,0,2.5,Undetermined,Undetermined,0,0,0
+Bel00086,77,DL1994-07,DL-07-94,94-9472,1994-12-29,Saint-Paul-du-Nord,F,45,365,533,2.5,Neoplasia,Neoplasia,1,0,0
+Bel00095,84,DL1995-07,DL-07-95,95-5954,1995-07-31,"Grosses Roches",M,1,199,130,3,"Verminous bronchopneumonia",Infectious,0,0,0
+Bel00165,105,DL1997-07,DL-07-97,97-B740,1997-11-25,Baie-des-Sables,M,53,428,0,3.5,Undetermined,Undetermined,0,0,0
+Bel00203,112,DL1998-07,DL-07-98,98-8080,1998-08-07,Matane,M,36,406,639,2,"Protozoal pneumonia",Infectious,0,0,0
+Bel00204,112,DL1998-07,DL-07-98,98-8080,1998-08-07,Matane,M,36,406,639,2,"Protozoal pneumonia",Infectious,0,0,0
+Bel00244,121,DL1999-07,DL-07-99,99-A645,19-08-1999,"Trois-Pistoles (au large)",F,32,338,462,2,"Verminous bronchopneumonia",Infectious,0,0,0
+Bel00245,121,DL1999-07,DL-07-99,99-A645,19-08-1999,"Trois-Pistoles (au large)",F,32,338,462,2,"Verminous bronchopneumonia",Infectious,0,0,0
+Bel00384,143,DL2002-08,DL-08-02,02-E916,03-11-2002,Matane,M,28,425,858,2.5,"Infectious - bacterial",Infectious,0,0,0
+Bel00385,143,DL2002-08,DL-08-02,02-E916,03-11-2002,Matane,M,28,425,858,2.5,"Infectious - bacterial",Infectious,0,0,0
+Bel00420,152,DL2003-08,DL-08-03,03-A019,24-11-2003,Tadoussac,M,33,374,782,3,Undetermined,Undetermined,0,0,0
+Bel00421,152,DL2003-08,DL-08-03,03-A019,24-11-2003,Tadoussac,M,33,374,782,3,Undetermined,Undetermined,0,0,0
+Bel00470,160,DL2004-08,DL-08-04,04-9218,13-09-2004,Matane,M,49,429,1000,3.5,Undetermined,Undetermined,0,0,0
+Bel00593,179,DL2007-08,DL-08-07,07-8525,11-09-2007,Rimouski,F,38,360,614,2,Undetermined,Undetermined,0,0,0
+Bel00594,179,DL2007-08,DL-08-07,07-8525,11-09-2007,Rimouski,F,38,360,614,2,Undetermined,Undetermined,0,0,0
+Bel00755,201,DL2010-08,DL-08-10,P1632-10,29-08-2010,"Sainte-Flavie 48 36 23 N X 68 14 28 W",F,31,369,729,3,"Dystocia / postpartum complication","Dystocia / postpartum complication",0,0,0
+Bel00756,201,DL2010-08,DL-08-10,P1632-10,29-08-2010,"Sainte-Flavie 48 36 23 N X 68 14 28 W",F,31,369,729,3,"Dystocia / postpartum complication","Dystocia / postpartum complication",0,0,0
+Bel00826,212,DL2011-08,DL-08-11,P1966-11,28-10-2011,Saint-Fabien,F,22,335,510,2.5,"Verminous bronchopneumonia",Infectious,0,0,0
+Bel00827,212,DL2011-08,DL-08-11,P1966-11,28-10-2011,Saint-Fabien,F,22,335,510,2.5,"Verminous bronchopneumonia",Infectious,0,0,0
+Bel00017,28,DL1988-08,DL-08-88,88-3703,1988-08-13,Baie-des-Sables,M,41,401,845,2.5,Undetermined,Undetermined,0,0,0
+Bel00039,42,DL1989-08,DL-08-89,89-5556,1989-12-06,Sainte-Félicité,M,45,419,0,2.5,Neoplasia,Neoplasia,1,0,0
+Bel00040,42,DL1989-08,DL-08-89,89-5556,1989-12-06,Sainte-Félicité,M,45,419,0,2.5,Neoplasia,Neoplasia,1,0,0
+Bel00078,69,DL1993-08,DL-08-93,93-7158,1993-10-20,"Les Méchins",F,16,355,578,2,"Dystocia / postpartum complication","Dystocia / postpartum complication",0,0,0
+Bel00096,85,DL1995-08,DL-08-95,95-6240,1995-08-10,Bic,F,0,157,64,2,"Neonatal mortality","Neonatal mortality",0,0,0
+Bel00127,97,DL1996-08,DL-08-96,96-8218,1996-10-18,Petit-Matane,F,2,216,151,2,"Verminous bronchopneumonia",Infectious,0,0,0
+Bel00205,113,DL1998-08,DL-08-98,98-A116,27-09-1998,Port-Cartier,M,45,396,862,3,"Protozoal pneumonia",Infectious,0,0,0
+Bel00206,113,DL1998-08,DL-08-98,98-A116,27-09-1998,Port-Cartier,M,45,396,862,3,"Protozoal pneumonia",Infectious,0,0,0
+Bel00246,122,DL1999-08,DL-08-99,99-D065,13-09-1999,"Cacouna (au large)",F,0,157,0,3,"Neonatal mortality","Neonatal mortality",0,0,0
+Bel00386,144,DL2002-09,DL-09-02,02-F249,08-11-2002,Baie-des-Sables,M,48,420,1160,2.5,"Verminous bronchopneumonia",Infectious,0,0,0
+Bel00387,144,DL2002-09,DL-09-02,02-F249,08-11-2002,Baie-des-Sables,M,48,420,1160,2.5,"Verminous bronchopneumonia",Infectious,0,0,0
+Bel00388,144,DL2002-09,DL-09-02,02-F249,08-11-2002,Baie-des-Sables,M,48,420,1160,2.5,"Verminous bronchopneumonia",Infectious,0,0,0
+Bel00719,161,DL2004-09,DL-09-04,04-A135,10-10-2004,Métis-sur-Mer,M,25,300,436,2,"Infectious - viral",Infectious,0,0,0
+Bel00595,180,DL2007-09,DL-09-07,07-8905,22-09-2007,Forestville,M,50,405,998,2.5,"Infectious - bacterial",Infectious,0,0,0
+Bel00596,180,DL2007-09,DL-09-07,07-8905,22-09-2007,Forestville,M,50,405,998,2.5,"Infectious - bacterial",Infectious,0,0,0
+Bel00757,202,DL2010-09,DL-09-10,P6-11,04-11-2010,"Sacré-Cœur Rimouski 48 25 29 N X 68 36 12 W",M,1,175,90,2,"Verminous bronchopneumonia",Infectious,0,0,0
+Bel00758,202,DL2010-09,DL-09-10,P6-11,04-11-2010,"Sacré-Cœur Rimouski 48 25 29 N X 68 36 12 W",M,1,175,90,2,"Verminous bronchopneumonia",Infectious,0,0,0
+Bel00828,213,DL2011-09,DL-09-11,P2076-11,09-11-2011,Pointe-aux-Outardes,M,43,435,1368,2.5,Undetermined,Undetermined,0,0,0
+Bel00829,213,DL2011-09,DL-09-11,P2076-11,09-11-2011,Pointe-aux-Outardes,M,43,435,1368,2.5,Undetermined,Undetermined,0,0,0
+Bel00018,29,DL1988-09,DL-09-88,88-4436,1988-10-07,"Chenal sud - RDL",F,45,365,0,2,Neoplasia,Neoplasia,1,1,1
+Bel00079,70,DL1993-09,DL-09-93,93-8453,1993-12-08,Sainte-Anne-des-Monts,M,48,409,0,3,Undetermined,Undetermined,0,0,0
+Bel00080,70,DL1993-09,DL-09-93,93-8453,1993-12-08,Sainte-Anne-des-Monts,M,48,409,0,3,Undetermined,Undetermined,0,0,0
+Bel00097,86,DL1995-09,DL-09-95,95-6418,1995-08-18,Pointe-au-Pic,M,3,247,278,2,"Verminous bronchopneumonia",Infectious,0,0,0
+Bel00128,98,DL1996-09,DL-09-96,96-9330,1996-11-23,Saint-Ulric,M,50,393,1072,2.5,Neoplasia,Neoplasia,1,1,0
+Bel00207,114,DL1998-09,DL-09-98,98-D126,04-12-1998,Sainte-Flavie,M,47,406,1019,2.5,Neoplasia,Neoplasia,1,1,0
+Bel00247,123,DL1999-09,DL-09-99,99-D416,15-10-1999,Saint-Denis-de-Kamouraska,F,39,389,845,2.5,"Infectious - bacterial",Infectious,0,0,0
+Bel00248,123,DL1999-09,DL-09-99,99-D416,15-10-1999,Saint-Denis-de-Kamouraska,F,39,389,845,2.5,"Infectious - bacterial",Infectious,0,0,0
+Bel00471,162,DL2004-10,DL-10-04,04-C232,03-12-2004,Mont-Saint-Pierre,M,38,423,1170,3,"Infectious - bacterial",Infectious,0,0,0
+Bel00472,162,DL2004-10,DL-10-04,04-C232,03-12-2004,Mont-Saint-Pierre,M,38,423,1170,3,"Infectious - bacterial",Infectious,0,0,0
+Bel00597,181,DL2007-10,DL-10-07,07-A977,25-11-2007,Baie-des-Sables,M,24,392,850,2.5,Undetermined,Undetermined,0,0,0
+Bel00598,181,DL2007-10,DL-10-07,07-A977,25-11-2007,Baie-des-Sables,M,24,392,850,2.5,Undetermined,Undetermined,0,0,0
+Bel00759,203,DL2010-10,DL-10-10,P7-11,31-12-2010,"Ilot Flocon Saint-Fabien sur Mer 48 19 57 N X 68 51 01 W",M,2,165,85,2,"Infectious - viral",Infectious,0,0,0
+Bel00760,203,DL2010-10,DL-10-10,P7-11,31-12-2010,"Ilot Flocon Saint-Fabien sur Mer 48 19 57 N X 68 51 01 W",M,2,165,85,2,"Infectious - viral",Infectious,0,0,0
+Bel00019,30,DL1988-10,DL-10-88,88-4465,1988-10-11,Saint-Germain-de-Kamouraska,F,2,228,193,2,"Verminous bronchopneumonia",Infectious,0,0,0
+Bel00098,87,DL1995-10,DL-10-95,95-6561,1995-08-23,Rivière-du-Loup,M,0,168,74,3,"Neonatal mortality","Neonatal mortality",0,0,0
+Bel00771,204,DL2010-11,DL-11-10,P8-11,31-12-2010,"Saint-Maurice-de-l'échouerie (près de Cloridorme) 49 02 56 N X 64 28 43 W",F,35,388,652,2,"Primary starvation","Primary starvation",0,0,0
+Bel00772,204,DL2010-11,DL-11-10,P8-11,31-12-2010,"Saint-Maurice-de-l'échouerie (près de Cloridorme) 49 02 56 N X 64 28 43 W",F,35,388,652,2,"Primary starvation","Primary starvation",0,0,0
+Bel00773,204,DL2010-11,DL-11-10,P8-11,31-12-2010,"Saint-Maurice-de-l'échouerie (près de Cloridorme) 49 02 56 N X 64 28 43 W",F,35,388,652,2,"Primary starvation","Primary starvation",0,0,0
+Bel00021,31,DL1988-11,DL-11-88,88-4510,1988-10-13,Matane,F,51,371,619,2,Toxoplasmosis,Infectious,0,0,0
+Bel00951,214,DL2012-01,DL-12-001,P934-12,19-05-2012,Baie-des-Sables,F,26,364,629,2.5,"Dystocia / postpartum complication","Dystocia / postpartum complication",0,0,0
+Bel00952,214,DL2012-01,DL-12-001,P934-12,19-05-2012,Baie-des-Sables,F,26,364,629,2.5,"Dystocia / postpartum complication","Dystocia / postpartum complication",0,0,0
+Bel00953,215,DL2012-02,DL-12-002,P995-12,27-05-2012,"Grosses Roches",M,23,396,738,3,"Verminous bronchopneumonia",Infectious,0,0,0
+Bel00954,215,DL2012-02,DL-12-002,P995-12,27-05-2012,"Grosses Roches",M,23,396,738,3,"Verminous bronchopneumonia",Infectious,0,0,0
+Bel00955,216,DL2012-03,DL-12-003,P1370-12,16-07-2012,Île-aux-Fraises,F,21,357,697,3,Undetermined,Undetermined,0,0,0
+Bel00956,216,DL2012-03,DL-12-003,P1370-12,16-07-2012,Île-aux-Fraises,F,21,357,697,3,Undetermined,Undetermined,0,0,0
+Bel00957,218,DL2012-05,DL-12-005,P2144-12,04-08-2012,"Rivière-du-Loup (au large)",M,0,144,44,4,"Neonatal mortality","Neonatal mortality",0,0,0
+Bel00958,220,DL2012-07,DL-12-007,P1994-12,03-10-2012,Saint-Fabien-sur-Mer,F,3,260,273,3,"Verminous bronchopneumonia",Infectious,0,0,0
+Bel00959,220,DL2012-07,DL-12-007,P1994-12,03-10-2012,Saint-Fabien-sur-Mer,F,3,260,273,3,"Verminous bronchopneumonia",Infectious,0,0,0
+Bel00960,221,DL2012-08,DL-12-008,P2238-12,05-11-2012,Métis-sur-mer,M,53,402,940,3,Undetermined,Undetermined,0,0,0
+Bel00961,221,DL2012-08,DL-12-008,P2238-12,05-11-2012,Métis-sur-mer,M,53,402,940,3,Undetermined,Undetermined,0,0,0
+Bel00962,222,DL2012-09,DL-12-009,P2261-12,07-11-2012,Rivière-du-Loup,F,30,361,761,3.5,Undetermined,Undetermined,0,0,0
+Bel00963,222,DL2012-09,DL-12-009,P2261-12,07-11-2012,Rivière-du-Loup,F,30,361,761,3.5,Undetermined,Undetermined,0,0,0
+Bel00022,32,DL1988-12,DL-12-88,88-4703,1988-10-24,Port-au-Persil,F,32,352,617,2,Undetermined,Undetermined,0,0,0
+Bel00990,223,DL2013-01,DL-13-001,P1756-13,2013-07-28,Rimouski,F,0,136,34,2,"Neonatal mortality","Neonatal mortality",0,0,0
+Bel00991,223,DL2013-01,DL-13-001,P1756-13,2013-07-28,Rimouski,F,0,136,34,2,"Neonatal mortality","Neonatal mortality",0,0,0
+Bel00992,224,DL2013-02,DL-13-002,P1817-13,2013-09-02,Tourelle,M,0,148,46,2,"Neonatal mortality","Neonatal mortality",0,0,0
+Bel00993,224,DL2013-02,DL-13-002,P1817-13,2013-09-02,Tourelle,M,0,148,46,2,"Neonatal mortality","Neonatal mortality",0,0,0
+Bel00994,226,DL2013-04,DL-13-004,P2253-13,2013-10-25,"Longue Rive",F,47,367,716,3.5,Undetermined,Undetermined,0,0,0
+Bel00995,226,DL2013-04,DL-13-004,P2253-13,2013-10-25,"Longue Rive",F,47,367,716,3.5,Undetermined,Undetermined,0,0,0
+Bel00996,227,DL2013-05,DL-13-005,P2371-13,31-10-2013,"Les Escoumins",M,21,418,870,2,Undetermined,Undetermined,0,0,0
+Bel00997,227,DL2013-05,DL-13-005,P2371-13,31-10-2013,"Les Escoumins",M,21,418,870,2,Undetermined,Undetermined,0,0,0
+Bel00998,228,DL2013-06,DL-13-006,P2766-13,26-05-2013,Saint-Fabien-sur-Mer,F,34,352,470,2,"Infectious - bacterial",Infectious,0,0,0
+Bel00999,228,DL2013-06,DL-13-006,P2766-13,26-05-2013,Saint-Fabien-sur-Mer,F,34,352,470,2,"Infectious - bacterial",Infectious,0,0,0
+Bel01000,229,DL2013-07,DL-13-007,P2835-13,01-06-2013,Grand-Métis,M,54,438,596,2,"Verminous bronchopneumonia",Infectious,0,0,0
+Bel01001,229,DL2013-07,DL-13-007,P2835-13,01-06-2013,Grand-Métis,M,54,438,596,2,"Verminous bronchopneumonia",Infectious,0,0,0
+Bel00023,33,DL1988-13,DL-13-88,88-5086,1988-11-16,Matane,F,43,392,830,2,Undetermined,Undetermined,1,1,0
+Bel00024,33,DL1988-13,DL-13-88,88-5086,1988-11-16,Matane,F,43,392,830,2,Undetermined,Undetermined,1,1,0
+Bel01015,230,DL2014-01,DL-14-001,P1945-14,25-07-2014,Bic,M,0,147,50,1->2,"Neonatal mortality","Neonatal mortality",0,0,0
+Bel01016,230,DL2014-01,DL-14-001,P1945-14,25-07-2014,Bic,M,0,147,50,1->2,"Neonatal mortality","Neonatal mortality",0,0,0
+Bel01017,231,DL2014-02,DL-14-002,P2099-14,07-08-2014,Sainte-Flavie,F,9,339,600,3.5,Undetermined,Undetermined,0,0,0
+Bel01018,232,DL2014-03,DL-14-003,P2588-14,28-09-2014,Saint-André-de-Kamouraska,F,32,360,565,2.5,Undetermined,Undetermined,0,0,0
+Bel01019,232,DL2014-03,DL-14-003,P2588-14,28-09-2014,Saint-André-de-Kamouraska,F,32,360,565,2.5,Undetermined,Undetermined,0,0,0
+Bel00026,34,DL1988-14,DL-14-88,88-5255,1988-11-27,Cap-Bon-Désir,F,46,358,773,3,Undetermined,Undetermined,0,0,0
+Bel01203,233,DL2015-01,DL-15-001,P1383-15,26-05-2015,"Les Bergeronnes",M,39,320,860,3,Trauma,"Antropogenic causes",0,0,0
+Bel01204,233,DL2015-01,DL-15-001,P1383-15,26-05-2015,"Les Bergeronnes",M,39,320,860,3,Trauma,"Antropogenic causes",0,0,0
+Bel01205,233,DL2015-01,DL-15-001,P1383-15,26-05-2015,"Les Bergeronnes",M,39,320,860,3,Trauma,"Antropogenic causes",0,0,0
+Bel01206,233,DL2015-01,DL-15-001,P1383-15,26-05-2015,"Les Bergeronnes",M,39,320,860,3,Trauma,"Antropogenic causes",0,0,0
+Bel01207,234,DL2015-02,DL-15-002,P1395-15,31-05-2015,"Notre-Dame du Sacré-Cœur Rimouski",M,6,310,497,2.5,"Verminous bronchopneumonia",Infectious,0,0,0
+Bel01208,234,DL2015-02,DL-15-002,P1395-15,31-05-2015,"Notre-Dame du Sacré-Cœur Rimouski",M,6,310,497,2.5,"Verminous bronchopneumonia",Infectious,0,0,0
+Bel01209,235,DL2015-03,DL-15-003,P1864-15,17-07-2015,Sainte-Flavie,F,21,335,530,2.5,"Dystocia / postpartum complication","Dystocia / postpartum complication",0,0,0
+Bel01210,235,DL2015-03,DL-15-003,P1864-15,17-07-2015,Sainte-Flavie,F,21,335,530,2.5,"Dystocia / postpartum complication","Dystocia / postpartum complication",0,0,0
+Bel01211,236,DL2015-04,DL-15-004,P1931-15,25-07-2015,"Longue Rive",F,33,354,823,3,"Dystocia / postpartum complication","Dystocia / postpartum complication",0,0,0
+Bel01212,236,DL2015-04,DL-15-004,P1931-15,25-07-2015,"Longue Rive",F,33,354,823,3,"Dystocia / postpartum complication","Dystocia / postpartum complication",0,0,0
+Bel01213,237,DL2015-05,DL-15-005,P1961-15,29-07-2015,Sainte-Flavie,F,0,147,50,1->2,"Neonatal mortality","Neonatal mortality",0,0,0
+Bel01214,237,DL2015-05,DL-15-005,P1961-15,29-07-2015,Sainte-Flavie,F,0,147,50,1->2,"Neonatal mortality","Neonatal mortality",0,0,0
+Bel01215,238,DL2015-06,DL-15-006,P2145-15,18-08-2015,"Les Escoumins",F,33,371,720,2.5,"Dystocia / postpartum complication","Dystocia / postpartum complication",0,0,0
+Bel01216,238,DL2015-06,DL-15-006,P2145-15,18-08-2015,"Les Escoumins",F,33,371,720,2.5,"Dystocia / postpartum complication","Dystocia / postpartum complication",0,0,0
+Bel01239,240,DL2016-01,DL-16-001,P1688-16,28-05-2016,"Les Escoumins",F,15,326,489,2,Undetermined,Undetermined,0,0,0
+Bel01240,240,DL2016-01,DL-16-001,P1688-16,28-05-2016,"Les Escoumins",F,15,326,489,2,Undetermined,Undetermined,0,0,0
+Bel01241,241,DL2016-02,DL-16-002,P2017-16,28-06-2016,Sainte-Flavie,F,18,352,575,3,Toxoplasmosis,Infectious,0,0,0
+Bel01242,241,DL2016-02,DL-16-002,P2017-16,28-06-2016,Sainte-Flavie,F,18,352,575,3,Toxoplasmosis,Infectious,0,0,0
+Bel01243,242,DL2016-03,DL-16-003,P2442-16,05-08-2016,Pointe-au-Père,F,0,161,59,2,"Neonatal mortality","Neonatal mortality",0,0,0
+Bel01244,242,DL2016-03,DL-16-003,P2442-16,05-08-2016,Pointe-au-Père,F,0,161,59,2,"Neonatal mortality","Neonatal mortality",0,0,0
+Bel01245,243,DL2016-04,DL-16-004,P2881-16,13-09-2016,Trois-Pistoles,F,39,379,691,3,Undetermined,Undetermined,0,0,0
+Bel01246,243,DL2016-04,DL-16-004,P2881-16,13-09-2016,Trois-Pistoles,F,39,379,691,3,Undetermined,Undetermined,0,0,0
+Bel01298,245,DL2017-01,DL-17-001,P1651-17,20-05-2017,"Île aux Basques ",F,53,363,690,2,"Infectious - undetermined",Infectious,0,0,0
+Bel01299,245,DL2017-01,DL-17-001,P1651-17,20-05-2017,"Île aux Basques ",F,53,363,690,2,"Infectious - undetermined",Infectious,0,0,0
+Bel01300,246,DL2017-02,DL-17-002,P3026-17,09-09-2017,Baie-des-Sables,M,36,480,1275,3.5,"Infectious - parasite",Infectious,0,0,0
+Bel01301,246,DL2017-02,DL-17-002,P3026-17,09-09-2017,Baie-des-Sables,M,36,480,1275,3.5,"Infectious - parasite",Infectious,0,0,0
+Bel01302,247,DL2017-03,DL-17-003,P3164-17,19-09-2017,"Rivière Ouelle",F,43,388,680,3.5,"Dystocia / postpartum complication","Dystocia / postpartum complication",0,0,0
+Bel01303,247,DL2017-03,DL-17-003,P3164-17,19-09-2017,"Rivière Ouelle",F,43,388,680,3.5,"Dystocia / postpartum complication","Dystocia / postpartum complication",0,0,0
+Bel01304,248,DL2017-04,DL-17-004,P3548-17,23-10-2017,Saint-Ulric,F,45,398,649,2,Inanition,Inanition,0,0,0
+Bel01305,248,DL2017-04,DL-17-004,P3548-17,23-10-2017,Saint-Ulric,F,45,398,649,2,Inanition,Inanition,0,0,0
+Bel01306,249,DL2017-05,DL-17-005,P4029-17,28-11-2017,Saint-Ulric,M,7,294,400,2,"Infectious - bactérien",Infectious,0,0,0
+Bel01307,249,DL2017-05,DL-17-005,P4029-17,28-11-2017,Saint-Ulric,M,7,294,400,2,"Infectious - bactérien",Infectious,0,0,0
+Bel01308,251,DL2017-07,DL-17-007,P368-18,01-08-2017,"Grand Métis",M,0,158.5,50,2,"Neonatal mortality","Neonatal mortality",0,0,0
+Bel01309,251,DL2017-07,DL-17-007,P368-18,01-08-2017,"Grand Métis",M,0,158.5,50,2,"Neonatal mortality","Neonatal mortality",0,0,0
+Bel01310,251,DL2017-07,DL-17-007,P368-18,01-08-2017,"Grand Métis",M,0,158.5,50,2,"Neonatal mortality","Neonatal mortality",0,0,0
+Bel01357,252,DL2018-01,DL2018-001,P1742-18,20-05-2018,"Ile Verte",F,47,368,685,2,"Intraspecific trauma","Social interaction",0,0,0
+Bel01358,252,DL2018-01,DL2018-001,P1742-18,20-05-2018,"Ile Verte",F,47,368,685,2,"Intraspecific trauma","Social interaction",0,0,0
+Bel01359,253,DL2018-02,DL2018-002,P2286-18,10-07-2018,"Petit Matane",F,18,374,630,3.5,"Dystocia / postpartum complication","Dystocia / postpartum complication",0,0,0
+Bel01360,253,DL2018-02,DL2018-002,P2286-18,10-07-2018,"Petit Matane",F,18,374,630,3.5,"Dystocia / postpartum complication","Dystocia / postpartum complication",0,0,0
+Bel01361,254,DL2018-03,DL2018-003,P2400-18,22-07-2018,"Le Bic",F,36,368,775,2.5,"Dystocia / postpartum complication","Dystocia / postpartum complication",0,0,0
+Bel01362,254,DL2018-03,DL2018-003,P2400-18,22-07-2018,"Le Bic",F,36,368,775,2.5,"Dystocia / postpartum complication","Dystocia / postpartum complication",0,0,0
+Bel01616,255,DL2018-04,DL2018-004,P2462-18,29-07-2018,"Baie Sainte-Marguerite",F,45,363,633,2.5,"Infectious - bacterial",Infectious,0,0,0
+Bel01376,256,DL2019-01,DL2019-001,P1299-19,08-04-2019,Baie-des-Sables,F,5,284,370,2.5,Undetermined,Undetermined,0,0,0
+Bel01377,256,DL2019-01,DL2019-001,P1299-19,08-04-2019,Baie-des-Sables,F,5,284,370,2.5,Undetermined,Undetermined,0,0,0
+Bel01378,257,DL2019-02,DL2019-002,P1751-19,13-05-2019,Rimouski,M,1,209,194,2,"Infectious - bacterial",Infectious,0,0,0
+Bel01379,257,DL2019-02,DL2019-002,P1751-19,13-05-2019,Rimouski,M,1,209,194,2,"Infectious - bacterial",Infectious,0,0,0
+Bel01380,258,DL2019-03,DL2019-003,P2194-19,19-06-2019,Saint-Ulric,M,0,494,1227,4,Trauma,"Antropogenic causes",0,0,0
+Bel01381,258,DL2019-03,DL2019-003,P2194-19,19-06-2019,Saint-Ulric,M,0,494,1227,4,Trauma,"Antropogenic causes",0,0,0
+Bel01382,259,DL2019-04,DL2019-004,P2342-19,04-07-2019,Sainte-Flavie,F,33,398,940,3,"Dystocia / postpartum complication","Dystocia / postpartum complication",0,0,0
+Bel01383,259,DL2019-04,DL2019-004,P2342-19,04-07-2019,Sainte-Flavie,F,33,398,940,3,"Dystocia / postpartum complication","Dystocia / postpartum complication",0,0,0
+Bel01384,260,DL2019-05,DL2019-005,P2491-19,16-07-2019,Grosse-Roches,F,21,358,720,3.5,"Dystocia / postpartum complication","Dystocia / postpartum complication",0,0,0
+Bel01385,260,DL2019-05,DL2019-005,P2491-19,16-07-2019,Grosse-Roches,F,21,358,720,3.5,"Dystocia / postpartum complication","Dystocia / postpartum complication",0,0,0
+Bel01386,261,DL2019-06,DL2019-006,P2712-19,01-08-2019,Rivière-du-loup,F,46,378,700,2.5,Undetermined,Undetermined,0,0,0
+Bel01387,261,DL2019-06,DL2019-006,P2712-19,01-08-2019,Rivière-du-loup,F,46,378,700,2.5,Undetermined,Undetermined,0,0,0
+Bel01388,262,DL2019-07,DL2019-007,P640-20,06-08-2019,"Les Méchins",F,0,156,43,2,"Neonatal mortality","Neonatal mortality",0,0,0
+Bel01389,262,DL2019-07,DL2019-007,P640-20,06-08-2019,"Les Méchins",F,0,156,43,2,"Neonatal mortality","Neonatal mortality",0,0,0
+Bel01390,263,DL2019-08,DL2019-008,P4485-19,17-10-2019,Matane,F,30,366,670,2.5,Undetermined,Undetermined,0,0,0
+Bel01391,263,DL2019-08,DL2019-008,P4485-19,17-10-2019,Matane,F,30,366,670,2.5,Undetermined,Undetermined,0,0,0
+Bel01392,264,DL2019-09,DL2019-009,P3950-19,09-11-2019,Cacouna,F,28,388,790,2.5,"Dystocia / postpartum complication","Dystocia / postpartum complication",0,0,0
+Bel01393,264,DL2019-09,DL2019-009,P3950-19,09-11-2019,Cacouna,F,28,388,790,2.5,"Dystocia / postpartum complication","Dystocia / postpartum complication",0,0,0
+Bel01530,265,DL2020-01,DL2020-001,P2226-20,23-05-2020,Matane,F,0,148,31,3,"Neonatal mortality","Neonatal mortality",0,0,0
+Bel01531,265,DL2020-01,DL2020-001,P2226-20,23-05-2020,Matane,F,0,148,31,3,"Neonatal mortality","Neonatal mortality",0,0,0
+Bel01532,266,DL2020-02,DL2020-002,P1727-20,2020-06-20,Sainte-Anne-des-Monts,M,48,460,992,3,Undetermined,Undetermined,0,0,0
+Bel01533,266,DL2020-02,DL2020-002,P1727-20,2020-06-20,Sainte-Anne-des-Monts,M,48,460,992,3,Undetermined,Undetermined,0,0,0
+Bel01534,267,DL2020-03,DL2020-003,P1916-20,08-07-2020,Escoumins,F,32,340,405,2.5,Inanition,Inanition,0,0,0
+Bel01535,267,DL2020-03,DL2020-003,P1916-20,08-07-2020,Escoumins,F,32,340,405,2.5,Inanition,Inanition,0,0,0
+Bel01536,268,DL2020-04,DL2020-004,P2158-20,31-07-2020,"Rivière Ouelle",F,0,148,0,4,"Neonatal mortality","Neonatal mortality",0,0,0
+Bel01537,268,DL2020-04,DL2020-004,P2158-20,31-07-2020,"Rivière Ouelle",F,0,148,0,4,"Neonatal mortality","Neonatal mortality",0,0,0
+Bel01538,269,DL2020-05,DL2020-005,P2121-20,2020-08-01,"Les Méchins",F,68,402,496,4,Undetermined,Undetermined,0,0,0
+Bel01539,269,DL2020-05,DL2020-005,P2121-20,2020-08-01,"Les Méchins",F,68,402,496,4,Undetermined,Undetermined,0,0,0
+Bel01540,270,DL2020-06,DL2020-006,P3360-20,2020-08-04,Matane,F,0,158,50,4,"Neonatal mortality","Neonatal mortality",0,0,0
+Bel01541,271,DL2020-07,DL2020-007,P2216-20,10-08-2020,"Notre-Dame-des-Sept-Douleurs ",F,56,381,519,2.5,"Infectious - bacterial",Infectious,0,0,0
+Bel01542,271,DL2020-07,DL2020-007,P2216-20,10-08-2020,"Notre-Dame-des-Sept-Douleurs ",F,56,381,519,2.5,"Infectious - bacterial",Infectious,0,0,0
+Bel01557,272,DL2021-01,DL2021-001,,04-04-2021,Cavendish,M,0,251,0,2,Undetermined,Undetermined,0,0,0
+Bel01558,272,DL2021-01,DL2021-001,,04-04-2021,Cavendish,M,0,251,0,2,Undetermined,Undetermined,0,0,0
+Bel01559,273,DL2021-02,DL2021-002,P1768-21,19-06-2021,Sainte-Lavie,F,0,345,490,2.5,Trauma,"Antropogenic causes",0,0,0
+Bel01560,273,DL2021-02,DL2021-002,P1768-21,19-06-2021,Sainte-Lavie,F,0,345,490,2.5,Trauma,"Antropogenic causes",0,0,0
+Bel01561,274,DL2021-03,DL2021-003,P1805-21,21-06-2021,Notre-Dame-des-Sept-Douleurs,F,0,337,496,3,"Dystocia / postpartum complication","Dystocia / postpartum complication",0,0,0
+Bel01562,274,DL2021-03,DL2021-003,P1805-21,21-06-2021,Notre-Dame-des-Sept-Douleurs,F,0,337,496,3,"Dystocia / postpartum complication","Dystocia / postpartum complication",0,0,0
+Bel01563,275,DL2021-04,DL2021-004,P1876-21,01-07-2021,Saint-Ulric,F,0,352,657,3,Undetermined,Undetermined,0,0,0
+Bel01564,275,DL2021-04,DL2021-004,P1876-21,01-07-2021,Saint-Ulric,F,0,352,657,3,Undetermined,Undetermined,0,0,0
+Bel01565,275,DL2021-04,DL2021-004,P1876-21,01-07-2021,Saint-Ulric,F,0,352,657,3,Undetermined,Undetermined,0,0,0
+Bel01566,275,DL2021-04,DL2021-004,P1876-21,01-07-2021,Saint-Ulric,F,0,352,657,3,Undetermined,Undetermined,0,0,0
+Bel01567,276,DL2021-05,DL2021-005,P3099-21,04-08-2021,"Le Bic",M,0,177,81,2,"Neonatal mortality","Neonatal mortality",0,0,0
+Bel01568,276,DL2021-05,DL2021-005,P3099-21,04-08-2021,"Le Bic",M,0,177,81,2,"Neonatal mortality","Neonatal mortality",0,0,0
