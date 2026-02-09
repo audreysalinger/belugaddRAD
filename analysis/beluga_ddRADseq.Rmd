@@ -217,9 +217,9 @@ g2 is a measure of identity disequilibrium, which reflects how heterozygosity (o
 
 ```{r InbreedR g2, eval=FALSE, include=FALSE}
 # for the 0.01 data set
-g2_01 = g2_snps(inbreedR_input_01,
-                nperm = 100, nboot = 10000, boot_over = "inds", CI = 0.95,
-                parallel = TRUE, ncores = 4)
+#g2_01 = g2_snps(inbreedR_input_01,
+                #nperm = 100, nboot = 10000, boot_over = "inds", CI = 0.95,
+                #parallel = TRUE, ncores = 4)
 
 # for the 0.001 data set
 g2_001 = g2_snps(inbreedR_input_001,
@@ -227,11 +227,13 @@ g2_001 = g2_snps(inbreedR_input_001,
                  parallel = TRUE, ncores = 4)
 
 # save the results in a table
-g2_100x10000 = data.frame(alphas = c(0.01, 0.001),
-                          g2 = c(g2_01$g2, g2_001$g2),
-                          CI_2.5 = c(g2_01$CI_boot[1], g2_001$CI_boot[1]),
-                          CI_97.5 = c(g2_01$CI_boot[2], g2_001$CI_boot[2]),
-                          p_val = c(g2_01$p_val, g2_001$p_val))
+g2_100x10000 = data.frame(alpha = 0.001,
+                          g2 = g2_001$g2,
+                          CI_2.5 = g2_001$CI_boot[1],
+                          CI_97.5 = g2_001$CI_boot[2],
+                          p_val = g2_001$p_val,
+                          nperm = 100,
+                          nboot = 10000)
 
 write.table(g2_100x10000, file = "g2_100x10000.tsv", sep = "\t", row.names = FALSE)
 
@@ -248,10 +250,18 @@ plot(g2_001, main = "0.001", col = "#88A2B9")
 dev.off()
 
 ## open pdf file
-pdf("plots/g2-plot-0.001.pdf", width = 7, height = 4)
+pdf("plots/g2-plot-0.001.pdf", width = 5, height = 4)
 ## create plots
 par(mfrow = c(1,1))
 plot(g2_001, col = "#88A2B9")
+## close the file
+dev.off()
+
+## open pdf file
+pdf("../supplementary_figures/Figure_S5.pdf", width = 5, height = 4)
+## create plots
+par(mfrow = c(1,1))
+plot(g2_001, col = "#88A2B9", main = NA)
 ## close the file
 dev.off()
 ```
@@ -367,8 +377,57 @@ write.table(IR_df, file = "inbreeding-coefficients/IR.tsv", sep = "\t")
 write.table(HL_df, file = "inbreeding-coefficients/HL.tsv", sep = "\t")
 ```
 
+## 2. Plotting results
+
+Import the mortality data:
+```{r import and edit mortality data}
+mortality = read.csv("beluga-mortalities.csv") %>% select(lab_code, date_found, sex, estimated_age, category, broad_category)
+
+# filter mortality data set for just the individuals in the analysis
+mortality = subset(mortality, lab_code %in% genetic_data$sample)
+
+# create updated mortality classes
+mortality = mortality %>% mutate(new_category = case_when(
+            broad_category == "Dystocia / postpartum complication" ~ "Dystocia",
+            broad_category == "Antropogenic causes" ~ "Anthropogenic causes",
+            broad_category == "Neoplasia" ~ "Neoplasia",
+            broad_category == "Infectious" ~ "Infectious disease",
+            category == "Degenerative changes" ~ "Degenerative changes",
+            category == "Undetermined" ~ "Undetermined",
+            broad_category == "Neonatal mortality" ~ "Neonatal mortality"))
+
+# create data frame for the live samples
+live_samples = data.frame(lab_code = c("Bel00100", "Bel00739", "Bel01064", "Bel01664", "Bel00854"),
+                          date_found = c(1995, 2009, 2014, 2022, 2000),
+                          sex = c("M", "M", "M", "F", "M"),
+                          estimated_age = NA,
+                          category = "Live biopsy",
+                          broad_category = "Live biopsy",
+                          new_category = "Live biopsy")
+
+# create a data frame that includes field info for both the dead and live samples
+field_data = rbind(mortality, live_samples)
+write.table(field_data, file = "field-data.tsv", sep = "\t", row.names = FALSE)
+
+# number of males and females
+field_data %>% dplyr::count(sex)
+
+# date range
+range(field_data$date_found)
+```
+
+Create a data frame with both field and genetic data:
+```{r mortality plot data}
+# create a data frame with sample name, cause of mortality, and inbreeding coefficients
+combined_data = genetic_data %>% inner_join(field_data, by = join_by(sample == lab_code))
+
+# reorder the new category factor to put live biopsy last
+combined_data$new_category = factor(combined_data$new_category, levels = c("Anthropogenic causes", "Degenerative changes", "Dystocia", "Infectious disease", "Neonatal mortality",  "Neoplasia", "Undetermined", "Live biopsy"))
+```
+
 ### Summary statistics for coefficients
 ```{r calculate coefficient summary stats}
+# summarize all whales together 
 coeff_summary_0.001 = data.frame(F = unclass(summary(F_0.001$F)),
                                  sMLH = unclass(summary(sMLH_df$sMLH_0.001)),
                                  IR = unclass(summary(IR_df$IR_0.001)),
@@ -384,9 +443,45 @@ rownames(coeff_summary_0.001)[rownames(coeff_summary_0.001) == "7"] <- "sd"
 
 # save df
 write.table(coeff_summary_0.001, file = "inbreeding-coefficients/coeff_summary_0.001.tsv", sep = "\t")
-```
 
-## 2. Plotting results
+# summary for live whales separately
+live <- combined_data %>% filter(new_category == "Live biopsy")
+
+coeff_summary_live <- data.frame(F = unclass(summary(live$F_0.001)),
+                                 sMLH = unclass(summary(live$sMLH_0.001)),
+                                 IR = unclass(summary(live$IR_0.001)),
+                                 HL = unclass(summary(live$HL_0.001)))
+# add sd
+coeff_summary_live[nrow(coeff_summary_live) + 1,] = c(sd(live$F_0.001),
+                                                      sd(live$sMLH_0.001),
+                                                      sd(live$IR_0.001),
+                                                      sd(live$HL_0.001))
+rownames(coeff_summary_live)[rownames(coeff_summary_live) == "7"] <- "sd"
+
+# round decimals
+coeff_summary_live <- round(coeff_summary_live, 3)
+
+# summary for dead whales separately
+dead <- combined_data %>% filter(new_category != "Live biopsy")
+
+coeff_summary_dead <- data.frame(F = unclass(summary(dead$F_0.001)),
+                                 sMLH = unclass(summary(dead$sMLH_0.001)),
+                                 IR = unclass(summary(dead$IR_0.001)),
+                                 HL = unclass(summary(dead$HL_0.001)))
+# add sd
+coeff_summary_dead[nrow(coeff_summary_dead) + 1,] = c(sd(dead$F_0.001),
+                                                      sd(dead$sMLH_0.001),
+                                                      sd(dead$IR_0.001),
+                                                      sd(dead$HL_0.001))
+rownames(coeff_summary_dead)[rownames(coeff_summary_dead) == "7"] <- "sd"
+
+# round decimals
+coeff_summary_dead <- round(coeff_summary_dead, 3)
+
+# save df
+write.table(coeff_summary_live, file = "inbreeding-coefficients/coeff_summary_live.tsv", sep = "\t")
+write.table(coeff_summary_dead, file = "inbreeding-coefficients/coeff_summary_dead.tsv", sep = "\t")
+```
 
 ### Inbreeding coefficient histograms
 
@@ -686,43 +781,6 @@ get_wrapper = function(width) {
 }
 ```
 
-Import the mortality data:
-```{r import and edit mortality data}
-mortality = read.csv("beluga-mortalities.csv") %>% select(lab_code, date_found, sex, estimated_age, category, broad_category)
-
-# filter mortality data set for just the individuals in the analysis
-mortality = subset(mortality, lab_code %in% genetic_data$sample)
-
-# create updated mortality classes
-mortality = mortality %>% mutate(new_category = case_when(
-            broad_category == "Dystocia / postpartum complication" ~ "Dystocia",
-            broad_category == "Antropogenic causes" ~ "Anthropogenic causes",
-            broad_category == "Neoplasia" ~ "Neoplasia",
-            broad_category == "Infectious" ~ "Infectious disease",
-            category == "Degenerative changes" ~ "Degenerative changes",
-            category == "Undetermined" ~ "Undetermined",
-            broad_category == "Neonatal mortality" ~ "Neonatal mortality"))
-
-# create data frame for the live samples
-live_samples = data.frame(lab_code = c("Bel00100", "Bel00739", "Bel01064", "Bel01664", "Bel00854"),
-                          date_found = c(1995, 2009, 2014, 2022, 2000),
-                          sex = c("M", "M", "M", "F", "M"),
-                          estimated_age = NA,
-                          category = "Live biopsy",
-                          broad_category = "Live biopsy",
-                          new_category = "Live biopsy")
-
-# create a data frame that includes field info for both the dead and live samples
-field_data = rbind(mortality, live_samples)
-write.table(field_data, file = "field-data.tsv", sep = "\t", row.names = FALSE)
-
-# number of males and females
-field_data %>% dplyr::count(sex)
-
-# date range
-range(field_data$date_found)
-```
-
 Make a bar plot of sample counts and sex breakdown by mortality category:
 ```{r sample info bar plot, fig.height=4, fig.width=6}
 sample_info_plot = ggplot(data = mortality, aes(factor(new_category))) +
@@ -744,15 +802,6 @@ ggsave(plot = sample_info_plot, "plots/sample_info_plot.tiff", "tiff", width = 6
 ```
 
 ### Inbreeding coefficient dotplots divided by sex
-
-Create a data frame with both field and genetic data:
-```{r mortality plot data}
-# create a data frame with sample name, cause of mortality, and inbreeding coefficients
-combined_data = genetic_data %>% inner_join(field_data, by = join_by(sample == lab_code))
-
-# reorder the new category factor to put live biopsy last
-combined_data$new_category = factor(combined_data$new_category, levels = c("Anthropogenic causes", "Degenerative changes", "Dystocia", "Infectious disease", "Neonatal mortality",  "Neoplasia", "Undetermined", "Live biopsy"))
-```
 
 I will create another mortality category that splits up infection type.
 ```{r separate infection categories}
@@ -789,21 +838,27 @@ sample_info_plot2 = ggplot(data = combined_data %>% filter((split_inf_category !
                            aes(factor(split_inf_category))) +
                     geom_bar(stat = "count", aes(fill = sex)) +
                     theme_bw() +
-                    theme(text = element_text(size = 10,  family = "sans"),
-                          axis.title.x = element_text(margin = margin(t = 7)),
+                    theme(text = element_text(size = 8.125,  family = "sans"),
+                          axis.title = element_text(size = 8.125),
+                          axis.title.x = element_text(margin = margin(t = -2, b = -6.5)),
                           axis.title.y = element_text(vjust = 2),
                           axis.text.x = element_text(angle = 90, vjust = 0.5,
                                                      hjust = 1),
-                          legend.position = "bottom") +
+                          legend.position = "bottom",
+                          legend.key.size = unit(2.5, 'mm'),
+                          legend.margin = margin(b = 0),
+                          legend.text = element_text(margin = margin(l = 1.25, r = 1.25))) +
                     labs(x = "Cause of mortality", y = "Number of individuals") +
                     scale_x_discrete(labels = get_wrapper(10)) +
+                    ylim(0, 33.5) +
                     scale_fill_manual(values = c("#decf00", "#677E8E", "#2d4030"), name = "",
                                       labels = c("Female", "Male", "M-F")) +
-                    geom_text(aes(label = after_stat(count)), stat = "count", vjust = -0.25, colour = "black", size = 3)
+                    geom_text(aes(label = after_stat(count)), stat = "count", vjust = -0.25, colour = "black", size = 1.95)
 sample_info_plot2
 
 # save plot
 ggsave(plot = sample_info_plot2, "plots/sample_info_plot2.tiff", "tiff", width = 6, height = 4, units = "in")
+ggsave(plot = sample_info_plot2, "../figures/Figure_1.pdf", "pdf", width = 80, height = 65, units = "mm", dpi = 1000)
 ```
 
 I will plot inbreeding coefficient (F, sMLH, IR, HL) values in dotplots for the 0.001 dataset:
@@ -812,12 +867,13 @@ F_dotplot_0.001 = ggplot(data = combined_data, aes(x = F_0.001, fill = sex)) +
                   geom_dotplot(method = "histodot",
                                stackgroups = TRUE, binpositions = "all", binwidth = 0.0122705) +
                   theme_bw() +
-                  theme(text = element_text(size = 20,  family = "sans"),
-                        axis.title.x = element_text(margin = margin(t = 7)),
+                  theme(text = element_text(size = 10,  family = "sans"),
+                        axis.title.x = element_text(margin = margin(t = 3)),
                         axis.title.y = element_blank(),
                         axis.text.y = element_blank(),
                         axis.ticks.y = element_blank(),
-                        legend.position = "none") +
+                        legend.position = "none",
+                        plot.margin = margin(b = 3, t = 5, l = 3, r = 2)) +
                   scale_fill_manual(values = c("#decf00", "#677E8E", "#2d4030")) +
                   labs(x = "F")
 F_dotplot_0.001
@@ -826,12 +882,13 @@ sMLH_dotplot_0.001 = ggplot(data = combined_data, aes(x = sMLH_0.001, fill = sex
                     geom_dotplot(method = "histodot",
                                  stackgroups = TRUE, binpositions = "all", binwidth = 0.0108) +
                     theme_bw() +
-                    theme(text = element_text(size = 20,  family = "sans"),
-                          axis.title.x = element_text(margin = margin(t = 7)),
+                    theme(text = element_text(size = 10,  family = "sans"),
+                          axis.title.x = element_text(margin = margin(t = 3)),
                           axis.title.y = element_blank(),
                           axis.text.y = element_blank(),
                           axis.ticks.y = element_blank(),
-                          legend.position = "none") +
+                          legend.position = "none",
+                          plot.margin = margin(b = 3, t = 5,  l = 2, r = 5)) +
                     scale_fill_manual(values = c("#decf00", "#677E8E", "#2d4030")) +
                     scale_x_continuous(breaks = c(0.9, 1.0, 1.1, 1.2)) +
                     labs(x = "sMLH")
@@ -841,12 +898,13 @@ IR_dotplot_0.001 = ggplot(data = combined_data, aes(x = IR_0.001, fill = sex)) +
                    geom_dotplot(method = "histodot",
                                 stackgroups = TRUE, binpositions = "all", binwidth = 0.010012) +
                    theme_bw() +
-                   theme(text = element_text(size = 20,  family = "sans"),
-                         axis.title.x = element_text(margin = margin(t = 7)),
+                   theme(text = element_text(size = 10,  family = "sans"),
+                         axis.title.x = element_text(margin = margin(t = 3)),
                          axis.title.y = element_blank(),
                          axis.text.y = element_blank(),
                          axis.ticks.y = element_blank(),
-                         legend.position = "none") +
+                         legend.position = "none",
+                         plot.margin = margin(b = 4, l = 3, r = 2, t = 5)) +
                    scale_fill_manual(values = c("#decf00", "#677E8E", "#2d4030")) +
                    labs(x = "IR")
 IR_dotplot_0.001
@@ -855,25 +913,26 @@ HL_dotplot_0.001 = ggplot(data = combined_data, aes(x = HL_0.001, fill = sex)) +
                    geom_dotplot(method = "histodot",
                                 stackgroups = TRUE, binpositions = "all", binwidth = 0.004) +
                    theme_bw() +
-                   theme(text = element_text(size = 20,  family = "sans"),
-                         axis.title.x = element_text(margin = margin(t = 7)),
+                   theme(text = element_text(size = 10,  family = "sans"),
+                         axis.title.x = element_text(margin = margin(t = 3)),
                          axis.title.y = element_blank(),
                          axis.text.y = element_blank(),
                          axis.ticks.y = element_blank(),
-                         legend.position = "none") +
+                         legend.position = "none",
+                         plot.margin = margin(b = 4, l = 2, r = 5, t = 5)) +
                    scale_fill_manual(values = c("#decf00", "#677E8E", "#2d4030")) +
                    labs(x = "HL")
 HL_dotplot_0.001
 
 # make a grid of the plots
-pdf("plots/0.001-coefficient-dotplots.pdf", width = 12, height = 8)
+histo_grid <- plot_grid(F_dotplot_0.001, sMLH_dotplot_0.001,
+              IR_dotplot_0.001, HL_dotplot_0.001,
+              nrow = 2, ncol = 2,
+              labels = c("(a)","(b)","(c)","(d)"), label_size = 12, hjust = -0.6, vjust = 2)
+histo_grid
 
-plot_grid(F_dotplot_0.001, sMLH_dotplot_0.001,
-          IR_dotplot_0.001, HL_dotplot_0.001,
-          nrow = 2, ncol = 2,
-          labels = "AUTO", label_size = 20, hjust = -2, vjust = 2.5)
-
-dev.off()
+ggsave(plot = histo_grid, "plots/0.001-coefficient-dotplots.pdf", width = 12, height = 8)
+ggsave(plot = histo_grid, "../figures/Figure_2.pdf", "pdf", width = 180, height = 120, units = "mm", dpi = 1000)
 ```
 
 ### Cause of death vs. inbreeding coefficient
@@ -918,7 +977,7 @@ ggsave(plot = IR_boxplot_0.001, "plots/extra_plots/IR_boxplot_0.001.tiff", "tiff
 IR_boxplot_0.001_sex = ggplot(data = combined_data, aes(x = factor(new_category), y = IR_0.001)) +
                        geom_boxplot(outlier.shape = NA) +
                        geom_boxplot(data = combined_data[combined_data$new_category == "Live biopsy", ],
-                                    outlier.shape = NA, aes(x = new_category, y = IR_0.001), colour = "#E2E260") +
+                                    outlier.shape = NA, aes(x = new_category, y = IR_0.001), colour = "#88A2B9") +
                        geom_jitter(alpha = 0.25,
                                    aes(colour = new_category, shape = sex, stroke = 1.5),
                                    width = 0.25) +
@@ -931,14 +990,14 @@ IR_boxplot_0.001_sex = ggplot(data = combined_data, aes(x = factor(new_category)
                              axis.title.y = element_text(vjust = 2),
                              axis.text.x = element_text(colour = biopsy_colour, face = biopsy_face,
                                                         )) +
-                       labs(x = "Sample category", y = "Internal relatedness (IR)", shape = "", legend) +
+                       labs(x = "Sample category", y = "Internal relatedness (IR)", shape = NULL, legend = NULL) +
                        scale_x_discrete(labels = get_wrapper(10)) +
                        annotate("text", x = n_label$new_category, y = 0.06,
                                 label = n_label$n,
                                 colour = biopsy_colour,
                                 fontface = c(1, 1, 1, 1, 1, 1, 1, 2), family = "sans") +
                        theme(legend.box.spacing = unit(0, "pt"),
-                             legend.margin = unit(0, "mm"),
+                             legend.spacing = unit(0, "mm"),
                              legend.spacing.x = unit(0, 'mm'))
 
 IR_boxplot_0.001_sex
@@ -956,46 +1015,55 @@ n_label_inf = combined_data %>% dplyr::count(split_inf_category)
 n_label_inf$n = paste("n=", n_label_inf$n, sep = "")
 
 # create a colour palette to highlight live biopsy samples in a different colour
-biopsy_colour2 = c("black", "black", "black", "black", "black", "black", "black", "black", "black", "black","#E2E260")
+biopsy_colour2 = c("black", "black", "black", "black", "black", "black", "black", "black", "black", "black","#88A2B9")
 # create a face palette to highlight live biopsy labels in bold
-biopsy_face2 = c("plain", "plain", "plain", "plain", "plain", "plain", "plain", "plain", "plain", "plain", "bold")
+#biopsy_face2 = c("plain", "plain", "plain", "plain", "plain", "plain", "plain", "plain", "plain", "plain", "bold")
 
 # same plot, but now with separate infectious categories
 IR_boxplot_0.001_SplitInf = ggplot(data = combined_data, aes(x = factor(split_inf_category), y = IR_0.001)) +
-                            geom_boxplot(outlier.shape = NA) +
+                            geom_boxplot(outlier.shape = NA, size = 0.45) +
                             geom_boxplot(data = combined_data[combined_data$split_inf_category == "Live biopsy", ],
                                          outlier.shape = NA, aes(x = split_inf_category,
                                                                  y = IR_0.001),
-                                         colour = "#E2E260") +
-                            geom_jitter(alpha = 0.25,
+                                         colour = "#88A2B9", size = 0.45) +
+                            geom_jitter(data = combined_data[combined_data$split_inf_category != "Live biopsy", ],
+                                        alpha = 0.26,
                                         aes(colour = split_inf_category, shape = sex,
-                                            stroke = 1.5),
-                                        width = 0.25) +
+                                            stroke = 0.24),
+                                        width = 0.2) +
+                            geom_jitter(data = combined_data[combined_data$split_inf_category == "Live biopsy", ],
+                                        alpha = 0.65,
+                                        aes(colour = split_inf_category, shape = sex,
+                                            stroke = 0.24),
+                                        width = 0.2) +
                             scale_color_manual(values = biopsy_colour2, guide = "none") +
                             scale_shape_discrete(labels = c("Female","Male", "M-F")) +
                             theme_bw() +
-                            theme(text = element_text(size = 12,  family = "sans"),
-                                  legend.position = "right",
-                                  axis.title.x = element_text(margin = margin(t = 7)),
+                            theme(text = element_text(size = 8.125,  family = "sans"),
+                                  axis.title = element_text(size = 8.2),
+                                  legend.position = "bottom",
+                                  legend.key.size = unit(2, 'mm'),
+                                  legend.text = element_text(margin = margin(l = 2, r = 2)),
+                                  legend.margin = margin(b = 0),
+                                  axis.title.x = element_text(margin = margin(t = -2, b = -6.5)),
                                   axis.title.y = element_text(vjust = 2),
-                                  axis.text.x = element_text(colour = biopsy_colour2,                                                       face = biopsy_face2,
+                                  axis.text.x = element_text(colour = biopsy_colour2, #face = biopsy_face2,
                                                 angle = 90, vjust = 0.5, hjust = 1)) +
                             labs(x = "Sample category", y = "Internal relatedness (IR)",
-                                shape = "", legend) +
-                            scale_x_discrete(labels = get_wrapper(11)) +
-                            annotate("text", x = n_label_inf$split_inf_category, y = 0.06,
-                                     label = n_label_inf$n,
-                                     colour = biopsy_colour2,
-                                     fontface = c(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2),
-                                     family = "sans") +
-                            theme(legend.box.spacing = unit(0, "pt"),
-                                  legend.margin = unit(0, "mm"),
-                                  legend.spacing.x = unit(0, 'mm'))
+                                shape = NULL, legend = NULL) +
+                            scale_x_discrete(labels = get_wrapper(11)) #+
+                            #annotate("text", x = n_label_inf$split_inf_category, y = 0.07,
+                                     #label = n_label_inf$n,
+                                     #colour = biopsy_colour2,
+                                     #fontface = c(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2),
+                                     #family = "sans",
+                                     #size = 1.9)
 
 IR_boxplot_0.001_SplitInf
 
 # save plot
 ggsave(plot = IR_boxplot_0.001_SplitInf, "plots/SplitInf_IR_boxplot_0.001.tiff", "tiff", width = 6, height = 4, units = "in")
+ggsave(plot = IR_boxplot_0.001_SplitInf, "../figures/Figure_3.pdf", "pdf", width = 80, height = 70, units = "mm", dpi = 1000)
 ```
 
 Box plot of sMLH vs. cause of mortality:
@@ -1051,7 +1119,7 @@ HL_boxplot_0.001
 ggsave(plot = HL_boxplot_0.001, "plots/extra_plots/HL_boxplot_0.001.tiff", "tiff", width = 6, height = 4, units = "in")
 ```
 
-### Age vs.inbreeding coefficient
+### Age vs. inbreeding coefficients
 
 ```{r age vs. inbreeding plots, fig.height=4, fig.width=6}
 # plot age vs. IR using the 0.001 dataset
@@ -1063,7 +1131,7 @@ age_vs_IR_0.001 = ggplot(data = (combined_data %>% filter(new_category != "Live 
                   theme(text = element_text(size = 12,  family = "sans"),
                         axis.title.x = element_text(margin = margin(t = 7)),
                         axis.title.y = element_text(vjust = 2))+
-                  labs(x = "Age (years)", y = "Internal relatedness (IR)")
+                  labs(x = "Age (years)", y = "IR")
 age_vs_IR_0.001
 
 # plot age vs. sMLH using the 0.001 dataset
@@ -1075,7 +1143,7 @@ age_vs_sMLH_0.001 = ggplot(data = (combined_data %>% filter(new_category != "Liv
                   theme(text = element_text(size = 12,  family = "sans"),
                         axis.title.x = element_text(margin = margin(t = 7)),
                         axis.title.y = element_text(vjust = 2))+
-                  labs(x = "Age (years)", y = expression(atop("Standardized multilocus heterozygosity", "(sMLH)")))
+                  labs(x = "Age (years)", y = "sMLH")
 age_vs_sMLH_0.001
 
 # plot age vs. HL using the 0.001 dataset
@@ -1087,13 +1155,56 @@ age_vs_HL_0.001 = ggplot(data = (combined_data %>% filter(new_category != "Live 
                   theme(text = element_text(size = 12,  family = "sans"),
                         axis.title.x = element_text(margin = margin(t = 7)),
                         axis.title.y = element_text(vjust = 2))+
-                  labs(x = "Age (years)", y = "Homozygosity by locus (HL)")
+                  labs(x = "Age (years)", y = "HL")
 age_vs_HL_0.001
+
+# plot age vs. F using the 0.001 dataset
+age_vs_F_0.001 = ggplot(data = (combined_data %>% filter(new_category != "Live biopsy")),
+                        aes(x = estimated_age, y = F_0.001)) +
+                 geom_point() +
+                 geom_smooth(method = "lm", colour = "#88A2B9", fill = "#88A2B9") +
+                 theme_bw() +
+                 theme(text = element_text(size = 12,  family = "sans"),
+                       axis.title.x = element_text(margin = margin(t = 7)),
+                       axis.title.y = element_text(vjust = 2))+
+                 labs(x = "Age (years)", y = "F")
+age_vs_F_0.001
+
+# create a stacked facet plot
+## pivot longer
+age_inb_long <- combined_data %>%
+                filter(new_category != "Live biopsy") %>%
+                select(sample, estimated_age, F_0.001, sMLH_0.001, IR_0.001, HL_0.001) %>%
+                pivot_longer(cols = c(F_0.001, sMLH_0.001, IR_0.001, HL_0.001),
+                             names_to = "inb_measure",
+                             values_to = "value")
+## clean up names
+age_inb_long$inb_measure <- factor(age_inb_long$inb_measure,
+                                   levels = c("F_0.001", "sMLH_0.001", "IR_0.001", "HL_0.001"),
+                                   labels = c("F", "sMLH", "IR", "HL"))
+  
+age_vs_inbreeding <- ggplot(age_inb_long, aes(x = estimated_age, y = value)) +
+                     geom_point(size = 0.6) +
+                     facet_grid(inb_measure ~ ., scales = "free_y", switch = "y") +
+                     geom_smooth(method = "lm", se = TRUE, colour = "#88A2B9", fill = "#88A2B9", size = 0.75) +
+                     theme_bw() +
+                     theme(text = element_text(size = 10,  family = "sans"),
+                           strip.placement = "outside", strip.background = element_blank()) +
+                     labs(x = "Age (years)", y = NULL) +
+                     scale_x_continuous(breaks = seq(0, 65, 10),
+                                        name = "Age (years)",
+                                        sec.axis = dup_axis(name = ""))
+
+age_vs_inbreeding
 
 # save plots
 ggsave(plot = age_vs_IR_0.001, "plots/age_vs_IR_0.001.tiff", "tiff", width = 6, height = 4, units = "in")
 ggsave(plot = age_vs_sMLH_0.001, "plots/age_vs_sMLH_0.001.tiff", "tiff", width = 6, height = 4, units = "in")
 ggsave(plot = age_vs_HL_0.001, "plots/age_vs_HL_0.001.tiff", "tiff", width = 6, height = 4, units = "in")
+ggsave(plot = age_vs_F_0.001, "plots/age_vs_F_0.001.tiff", "tiff", width = 6, height = 4, units = "in")
+
+ggsave(plot = age_vs_inbreeding, "plots/age_vs_inbreeding.tiff", "tiff", width = 6, height = 10, units = "in")
+ggsave(plot = age_vs_inbreeding, "../figures/Figure_5.pdf", "pdf", width = 80, height = 140, units = "mm")
 
 # correlation tests
 cor.test_IR = cor.test(combined_data$IR_0.001, combined_data$estimated_age)
@@ -1134,7 +1245,7 @@ year_boxplot_SplitInf = ggplot(data = dead_combined_data, aes(x = factor(split_i
                                      axis.text.x = element_text(angle = 90, vjust = 0.5,
                                                                 hjust = 1)) +
                                labs(x = "Cause of mortality", y = "Year found dead",
-                                    shape = "", legend) +
+                                    shape = "", legend = NULL) +
                                scale_x_discrete(labels = get_wrapper(11)) +
                                annotate("text", x = n_label_dead$split_inf_category, y = 0.06,
                                         label = n_label_dead$n,
@@ -1162,7 +1273,7 @@ age_boxplot_SplitInf = ggplot(data = dead_combined_data, aes(x = factor(split_in
                                     axis.title.x = element_text(margin = margin(t = 7)),
                                     axis.title.y = element_text(vjust = 2),
                                     axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1)) +
-                              labs(x = "Cause of mortality", y = "Year found dead", shape = "", legend) +
+                              labs(x = "Cause of mortality", y = "Year found dead", shape = "", legend = NULL) +
                               scale_x_discrete(labels = get_wrapper(11)) +
                               annotate("text", x = n_label_dead$split_inf_category, y = 0.06,
                                        label = n_label_dead$n,
@@ -1239,9 +1350,10 @@ model_data$cHL = model_data$HL_0.001 - mean(model_data$HL_0.001)
 ### Model 1: Effect of internal relatedness (IR) on cause of mortality
 
 ```{r model1 - IR}
+# model
 model1 = brm(formula = mortality ~ 1 + cIR, 
-               data = model_data, 
-               family = categorical(link = logit))
+             data = model_data,
+             family = categorical(link = logit))
 
 # evaluate model performance
 summary(model1)
@@ -1276,20 +1388,37 @@ model1_IR_ridges = ggplot(model1_slope_tidy,
                           aes(x = value, y = Mortality,
                               fill = factor(stat(quantile)))) +
                    theme_bw() +
-                   theme(text = element_text(size = 12,  family = "sans")) +
+                   theme(text = element_text(size = 17,  family = "sans")) +
                    stat_density_ridges(geom = "density_ridges_gradient",
                                        calc_ecdf = TRUE,
                                        quantiles = c(0.025, 0.975)) +
                    scale_fill_manual(values = alpha(c("#88A2B9", "#657E9D", "#88A2B9"), 0.6),
                                      guide = "none") +
                    geom_vline(xintercept = 0, alpha = 0.5, linetype = "dashed") + 
-                   labs(title = "Model 1: mortality ~ cIR",
-                        x = "log odds (IR) relative to 'anthropogenic causes'",
-                        y = "Cause of mortality")
+                   labs(#title = "Model 1: mortality ~ cIR",
+                        x = "Effect of IR on mortality (log odds)",
+                        y = "Cause of mortality") +
+                   scale_y_discrete(expand = expansion(add = c(0.5, 2)))
 model1_IR_ridges
 
 # save plot
 ggsave(plot = model1_IR_ridges, "plots/bayesian_models/model1_IR.tiff", "tiff", width = 6, height = 4, units = "in")
+ggsave(plot = model1_IR_ridges, "plots/bayesian_models/Figure_4_180mm.pdf", "pdf", width = 180, height = 120, units = "mm")
+
+# resize plot to 80 mm width using GhostScript
+infile  <- "plots/bayesian_models/Figure_4_180mm.pdf"
+outfile <- "../figures/Figure_4.pdf"
+
+target_width_mm  <- 80
+target_height_mm <- 54
+
+mm_to_pt <- 2.83465
+w_pt <- target_width_mm * mm_to_pt
+h_pt <- target_height_mm * mm_to_pt
+
+cmd <- sprintf("gs -o \"%s\" -sDEVICE=pdfwrite -dDEVICEWIDTHPOINTS=%.2f -dDEVICEHEIGHTPOINTS=%.2f -dPDFFitPage \"%s\"",
+               outfile, w_pt, h_pt, infile)
+system(cmd)
 ```
 
 ### Model 2: Effect of year on cause of mortality
@@ -1297,6 +1426,7 @@ ggsave(plot = model1_IR_ridges, "plots/bayesian_models/model1_IR.tiff", "tiff", 
 To get at the potential effects of changing environment and differential exposure to stressors over time on cause of mortality, I will look at the effect of year found dead on the probability of dying from different causes.
 
 ```{r model2 - year}
+# model
 model2 =  brm(formula = mortality ~ 1 + cYear, 
               data = model_data, 
               family = categorical(link = logit))
@@ -1334,21 +1464,31 @@ model2_year_ridges = ggplot(model2_slope_tidy,
                             aes(x = value, y = Mortality,
                                 fill = factor(stat(quantile)))) +
                      theme_bw() +
-                     theme(text = element_text(size = 12,  family = "sans")) +
+                     theme(text = element_text(size = 17,  family = "sans")) +
                      stat_density_ridges(geom = "density_ridges_gradient",
                                          calc_ecdf = TRUE,
                                          quantiles = c(0.025, 0.975)) +
                      scale_fill_manual(values = alpha(c("#88A2B9", "#657E9D", "#88A2B9"), 0.6),
                                        guide = "none") +
                      geom_vline(xintercept = 0, alpha = 0.5, linetype = "dashed") + 
-                     labs(title = "Model 2: mortality ~ cYear",
-                          x = "log odds (year) relative to 'anthropogenic causes'",
-                          y = "Cause of mortality")
+                     labs(#title = "Model 2: mortality ~ cYear",
+                          x = "Effect of year on mortality (log odds)",
+                          y = "Cause of mortality") +
+                     scale_y_discrete(expand = expansion(add = c(0.5, 2)))
 
 model2_year_ridges
 
 # save plot
 ggsave(plot = model2_year_ridges, "plots/bayesian_models/model2_year.tiff", "tiff", width = 6, height = 4, units = "in")
+ggsave(plot = model2_year_ridges, "plots/bayesian_models/Figure_8_180mm.pdf", "pdf", width = 180, height = 120, units = "mm")
+
+# resize plot to 80 mm width using GhostScript
+infile  <- "plots/bayesian_models/Figure_8_180mm.pdf"
+outfile <- "../figures/Figure_8.pdf"
+
+cmd <- sprintf("gs -o \"%s\" -sDEVICE=pdfwrite -dDEVICEWIDTHPOINTS=%.2f -dDEVICEHEIGHTPOINTS=%.2f -dPDFFitPage \"%s\"",
+               outfile, w_pt, h_pt, infile)
+system(cmd)
 ```
 
 ### Model 3: Effect of age on cause of mortality
@@ -1416,6 +1556,7 @@ ggsave(plot = model3_age_ridges, "plots/bayesian_models/model3_age_alldata.tiff"
 #### Age without neonatal mortality
 
 ```{r model3.1 - age w/o neonatal mortality}
+# model
 model3.1 =  brm(formula = mortality ~ 1 + cAge, 
                 data = (model_data %>% filter(mortality != "Neonatal mortality")), 
                 family = categorical(link = logit))
@@ -1453,20 +1594,30 @@ model3.1_age_ridges = ggplot(model3.1_slope_tidy,
                              aes(x = value, y = Mortality,
                                  fill = factor(stat(quantile)))) +
                       theme_bw() +
-                      theme(text = element_text(size = 12,  family = "sans")) +
+                      theme(text = element_text(size = 17,  family = "sans")) +
                       stat_density_ridges(geom = "density_ridges_gradient",
                                           calc_ecdf = TRUE,
                                           quantiles = c(0.025, 0.975)) +
                       scale_fill_manual(values = alpha(c("#88A2B9", "#657E9D", "#88A2B9"), 0.6),
                                         guide = "none") +
                       geom_vline(xintercept = 0, alpha = 0.5, linetype = "dashed") +           
-                      labs(title = "Model 3.1: mortality ~ cAge (w/o neonatal mortality)",
-                           x = "log odds (age) relative to 'anthropogenic causes'",
-                           y = "Cause of mortality")
+                      labs(#title = "Model 3.1: mortality ~ cAge (w/o neonatal mortality)",
+                           x = "Effect of age on mortality (log odds)",
+                           y = "Cause of mortality") +
+                      scale_y_discrete(expand = expansion(add = c(0.5, 2)))
 model3.1_age_ridges
 
 # save plot
 ggsave(plot = model3.1_age_ridges, "plots/bayesian_models/model3.1_age_noneonatal.tiff", "tiff", width = 6, height = 4, units = "in")
+ggsave(plot = model3.1_age_ridges, "plots/bayesian_models/Figure_6_180mm.pdf", "pdf", width = 180, height = 120, units = "mm")
+
+# resize plot to 80 mm width using GhostScript
+infile  <- "plots/bayesian_models/Figure_6_180mm.pdf"
+outfile <- "../figures/Figure_6.pdf"
+
+cmd <- sprintf("gs -o \"%s\" -sDEVICE=pdfwrite -dDEVICEWIDTHPOINTS=%.2f -dDEVICEHEIGHTPOINTS=%.2f -dPDFFitPage \"%s\"",
+               outfile, w_pt, h_pt, infile)
+system(cmd)
 ```
 
 #### Categorical age class
@@ -1557,9 +1708,13 @@ Chains did not mix. I will not proceed with this model.
 Because inbreeding depression may depend on environmental challenges (i.e., genetic differences in fitness are conditional and only revealed under adverse environmental conditions), I wonder if the year found dead (and relevant environmental exposures) has an impact on the effect of inbreeding on cause of mortality. To test this, I will implement a model with an interaction between these two variables.
 
 ```{r model 4 - IR x year}
+# model
 model4 = brm(formula = mortality ~ 1 + cIR + cYear + cIR:cYear, 
              data = model_data, 
              family = categorical(link = logit))
+
+
+stancode(model4)
 
 # evaluate model performance 
 summary(model4)
@@ -1660,22 +1815,33 @@ model4_IRxYear_ridges = ggplot(model4_IRxYear_slope_tidy,
                                aes(x = value, y = Mortality,
                                    fill = factor(stat(quantile)))) +
                         theme_bw() +
-                        theme(text = element_text(size = 12,  family = "sans")) +
+                        theme(text = element_text(size = 17,  family = "sans")) +
                         stat_density_ridges(geom = "density_ridges_gradient",
                                             calc_ecdf = TRUE,
                                             quantiles = c(0.025, 0.975)) +                      
                         scale_fill_manual(values = alpha(c("#88A2B9", "#657E9D", "#88A2B9"), 0.6),
                                           guide = "none") +
                         geom_vline(xintercept = 0, alpha = 0.5, linetype = "dashed") + 
-                        labs(title = "Model 4: mortality ~ cIR + cYear + cIR:cYear",
-                             x = "log odds (IRxYear) relative to 'anthropogenic causes'",
-                             y = "Cause of mortality")
+                        labs(#title = "Model 4: mortality ~ cIR + cYear + cIR:cYear",
+                             x = "Interaction effect of IR and year
+on mortality (log odds)",
+                             y = "Cause of mortality") +
+                        scale_y_discrete(expand = expansion(add = c(0.5, 2)))
 model4_IRxYear_ridges
 
 # save plots 
 ggsave(plot = model4_IR_ridges, "plots/bayesian_models/model4_IR.tiff", "tiff", width = 6, height = 4, units = "in")
 ggsave(plot = model4_year_ridges, "plots/bayesian_models/model4_year.tiff", "tiff", width = 6, height = 4, units = "in")
 ggsave(plot = model4_IRxYear_ridges, "plots/bayesian_models/model4_IRxYear.tiff", "tiff", width = 6, height = 4, units = "in")
+ggsave(plot = model4_IRxYear_ridges, "plots/bayesian_models/Figure_9_180mm.pdf", "pdf", width = 180, height = 120, units = "mm")
+
+# resize plot to 80 mm width using GhostScript
+infile  <- "plots/bayesian_models/Figure_9_180mm.pdf"
+outfile <- "../figures/Figure_9.pdf"
+
+cmd <- sprintf("gs -o \"%s\" -sDEVICE=pdfwrite -dDEVICEWIDTHPOINTS=%.2f -dDEVICEHEIGHTPOINTS=%.2f -dPDFFitPage \"%s\"",
+               outfile, w_pt, h_pt, infile)
+system(cmd)
 ```
 
 ### Model 5: Effect of the INTERACTION between IR and age on cause of mortality
@@ -1810,6 +1976,7 @@ ggsave(plot = model5_IRxAge_ridges, "plots/bayesian_models/model5_IRxAge.tiff", 
 
 #### IR x age without neonatal mortality
 ```{r model5.1 - IR x age w/o neonatal mortality}
+# model
 model5.1 = brm(formula = mortality ~ 1 + cIR + cAge + cIR:cAge,
              data = (model_data %>% filter(mortality != "Neonatal mortality")),
              family = categorical(link = logit))
@@ -1913,22 +2080,32 @@ model5.1_IRxAge_ridges = ggplot(model5.1_IRxAge_slope_tidy,
                                aes(x = value, y = Mortality,
                                    fill = factor(stat(quantile)))) +
                         theme_bw() +
-                        theme(text = element_text(size = 12,  family = "sans")) +
+                        theme(text = element_text(size = 17,  family = "sans")) +
                         stat_density_ridges(geom = "density_ridges_gradient",
                                             calc_ecdf = TRUE,
                                             quantiles = c(0.025, 0.975)) +                      
                         scale_fill_manual(values = alpha(c("#88A2B9", "#657E9D", "#88A2B9"), 0.6),
                                           guide = "none") +
                         geom_vline(xintercept = 0, alpha = 0.5, linetype = "dashed") + 
-                        labs(title = "Model 5.1: mortality ~ cIR + cAge + cIR:cAge \n(w/o neonatal mortality)",
-                             x = "log odds (IRxAge) relative to 'anthropogenic causes'",
-                             y = "Cause of mortality")
+                        labs(#title = "Model 5.1: mortality ~ cIR + cAge + cIR:cAge \n(w/o neonatal mortality)",
+                             x = "Interaction effect of IR and age
+on mortality (log odds)",
+                             y = "Cause of mortality") +
+                        scale_y_discrete(expand = expansion(add = c(0.5, 2)))
 model5.1_IRxAge_ridges
 
 # save plots 
 ggsave(plot = model5.1_IR_ridges, "plots/bayesian_models/model5.1_IR_noneonatal.tiff", "tiff", width = 6, height = 4, units = "in")
 ggsave(plot = model5.1_age_ridges, "plots/bayesian_models/model5.1_age_noneonatal.tiff", "tiff", width = 6, height = 4, units = "in")
-ggsave(plot = model5.1_IRxAge_ridges, "plots/bayesian_models/model5.1_IRxAge_noneonatal.tiff", "tiff", width = 6, height = 4, units = "in")
+ggsave(plot = model5.1_IRxAge_ridges, "plots/bayesian_models/Figure_7_180mm.pdf", "pdf", width = 180, height = 120, units = "mm")
+
+# resize plot to 80 mm width using GhostScript
+infile  <- "plots/bayesian_models/Figure_7_180mm.pdf"
+outfile <- "../figures/Figure_7.pdf"
+
+cmd <- sprintf("gs -o \"%s\" -sDEVICE=pdfwrite -dDEVICEWIDTHPOINTS=%.2f -dDEVICEHEIGHTPOINTS=%.2f -dPDFFitPage \"%s\"",
+               outfile, w_pt, h_pt, infile)
+system(cmd)
 ```
 
 ### Model comparison
