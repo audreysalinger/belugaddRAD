@@ -215,11 +215,11 @@ Identity disquilibrium is the phenomenon in which variation in inbreeding causes
   
 g2 is a measure of identity disequilibrium, which reflects how heterozygosity (or homozygosity) is correlated across markers/loci. The `g2_snps` function in InbreedR permutes the genetic data to generate a p-value for the null hypothesis of no variance in inbreeding in the samples (i.e., g2 = 0, all individuals experience the same level of inbreeding). Low g2 values may suggest low expected correlations between heterozygosity and inbreeding.
 
-```{r InbreedR g2, eval=FALSE, include=FALSE}
+```{r InbreedR g2 - Figure S5, eval=FALSE, include=FALSE}
 # for the 0.01 data set
-#g2_01 = g2_snps(inbreedR_input_01,
-                #nperm = 100, nboot = 10000, boot_over = "inds", CI = 0.95,
-                #parallel = TRUE, ncores = 4)
+g2_01 = g2_snps(inbreedR_input_01,
+                nperm = 100, nboot = 10000, boot_over = "inds", CI = 0.95,
+                parallel = TRUE, ncores = 4)
 
 # for the 0.001 data set
 g2_001 = g2_snps(inbreedR_input_001,
@@ -244,7 +244,7 @@ write.table(g2_100x10000, file = "g2_100x10000.tsv", sep = "\t", row.names = FAL
 pdf("plots/both_datasets/g2-plots.pdf", width = 7, height = 4)
 ## create plots
 par(mfrow = c(1,2))
-plot(g2_01, main = "0.01", col = "#677E8E")
+plot(g2_01, main = "0.01", col = "#88A2B9")
 plot(g2_001, main = "0.001", col = "#88A2B9")
 ## close the file
 dev.off()
@@ -804,7 +804,7 @@ ggsave(plot = sample_info_plot, "plots/sample_info_plot.tiff", "tiff", width = 6
 ### Inbreeding coefficient dotplots divided by sex
 
 I will create another mortality category that splits up infection type.
-```{r separate infection categories}
+```{r separate infection categories - Figure 1}
 # create updated mortality class that divides infectious disease by type: verminous infection, protozoan infection, bacterial infection
 ## combining undetermined & viral infections into other infection due to sample size
 combined_data = combined_data %>% mutate(split_inf_category = case_when(
@@ -862,7 +862,7 @@ ggsave(plot = sample_info_plot2, "../figures/Figure_1.pdf", "pdf", width = 80, h
 ```
 
 I will plot inbreeding coefficient (F, sMLH, IR, HL) values in dotplots for the 0.001 dataset:
-```{r dotplots of inbreeding coefficients for 0.001, fig.height=4, fig.width=6}
+```{r dotplots of inbreeding coefficients for 0.001 - Figure 2, fig.height=4, fig.width=6}
 F_dotplot_0.001 = ggplot(data = combined_data, aes(x = F_0.001, fill = sex)) +
                   geom_dotplot(method = "histodot",
                                stackgroups = TRUE, binpositions = "all", binwidth = 0.0122705) +
@@ -945,35 +945,11 @@ n_label = combined_data %>% dplyr::count(new_category)
 n_label$n = paste("n=", n_label$n, sep = "")
 
 # create a colour palette to highlight live biopsy samples in a different colour
-biopsy_colour = c("black", "black", "black", "black", "black", "black", "black", "#E2E260")
+biopsy_colour = c("black", "black", "black", "black", "black", "black", "black", "#88A2B9")
 # create a face palette to highlight live biopsy labels in bold
 biopsy_face = c("plain", "plain", "plain", "plain", "plain", "plain", "plain", "bold")
 
 # plot
-IR_boxplot_0.001 = ggplot(data = combined_data, aes(x = factor(new_category), y = IR_0.001)) +
-                   geom_boxplot(outlier.shape = NA) +
-                   geom_boxplot(data = combined_data[combined_data$new_category == "Live biopsy", ],
-                                outlier.shape = NA, aes(x = new_category, y = IR_0.001), colour = "#E2E260") +
-                   geom_jitter(alpha = 0.25, aes(colour = new_category), width = 0.25) +
-                   scale_color_manual(values = biopsy_colour) +
-                   theme_bw() +
-                   theme(text = element_text(size = 12,  family = "sans"),
-                         legend.position = "none",
-                         axis.title.x = element_text(margin = margin(t = 7)),
-                         axis.title.y = element_text(vjust = 2),
-                         axis.text.x = element_text(colour = biopsy_colour, face = biopsy_face)) +
-                   labs(x = "Sample category", y = "Internal relatedness (IR)") +
-                   scale_x_discrete(labels = get_wrapper(10)) +
-                   annotate("text", x = n_label$new_category, y = 0.06,
-                            label = n_label$n,
-                            colour = biopsy_colour,
-                            fontface = c(1, 1, 1, 1, 1, 1, 1, 2), family = "sans")
-IR_boxplot_0.001
-
-# save plot
-ggsave(plot = IR_boxplot_0.001, "plots/extra_plots/IR_boxplot_0.001.tiff", "tiff", width = 6, height = 4, units = "in")
-
-# same plot, but with points shaped to indicate sex
 IR_boxplot_0.001_sex = ggplot(data = combined_data, aes(x = factor(new_category), y = IR_0.001)) +
                        geom_boxplot(outlier.shape = NA) +
                        geom_boxplot(data = combined_data[combined_data$new_category == "Live biopsy", ],
@@ -999,15 +975,11 @@ IR_boxplot_0.001_sex = ggplot(data = combined_data, aes(x = factor(new_category)
                        theme(legend.box.spacing = unit(0, "pt"),
                              legend.spacing = unit(0, "mm"),
                              legend.spacing.x = unit(0, 'mm'))
-
 IR_boxplot_0.001_sex
-
-# save plot
-ggsave(plot = IR_boxplot_0.001_sex, "plots/IR_boxplot_0.001_sex.tiff", "tiff", width = 6, height = 4, units = "in")
 ```
 
 Box plot of IR vs. cause of mortality that includes separate infection causes and sex:
-```{r IR boxlot with sex AND separate infection causes}
+```{r IR boxlot with sex AND separate infection causes - Figure 3}
 # create a data frame to label the tops of bars
 n_label_inf = combined_data %>% dplyr::count(split_inf_category)
 
@@ -1071,7 +1043,7 @@ Box plot of sMLH vs. cause of mortality:
 sMLH_boxplot_0.001 = ggplot(data = combined_data, aes(x = factor(new_category), y = sMLH_0.001)) +
                      geom_boxplot(outlier.shape = NA) +
                      geom_boxplot(data = combined_data[combined_data$new_category == "Live biopsy", ],
-                                  outlier.shape = NA, aes(x = new_category, y = sMLH_0.001), colour = "#E2E260") +
+                                  outlier.shape = NA, aes(x = new_category, y = sMLH_0.001), colour = "#88A2B9") +
                      geom_jitter(alpha = 0.25, aes(colour = new_category), width = 0.25) +
                      scale_color_manual(values = biopsy_colour) +
                      theme_bw() +
@@ -1088,9 +1060,7 @@ sMLH_boxplot_0.001 = ggplot(data = combined_data, aes(x = factor(new_category), 
                               colour = biopsy_colour,
                               fontface = c(1, 1, 1, 1, 1, 1, 1, 2), family = "sans")
 sMLH_boxplot_0.001
-
-# save plot
-ggsave(plot = sMLH_boxplot_0.001, "plots/extra_plots/sMLH_boxplot_0.001.tiff", "tiff", width = 6, height = 4, units = "in")
+ggsave(plot = sMLH_boxplot_0.001, "plots/sMLH_boxplot_0.001.tiff", "tiff", width = 6, height = 4, units = "in")
 ```
 
 Box plot of HL vs. cause of mortality:
@@ -1098,7 +1068,7 @@ Box plot of HL vs. cause of mortality:
 HL_boxplot_0.001 = ggplot(data = combined_data, aes(x = factor(new_category), y = HL_0.001)) +
                    geom_boxplot(outlier.shape = NA) +
                    geom_boxplot(data = combined_data[combined_data$new_category == "Live biopsy", ],
-                                outlier.shape = NA, aes(x = new_category, y = HL_0.001), colour = "#E2E260") +
+                                outlier.shape = NA, aes(x = new_category, y = HL_0.001), colour = "#88A2B9") +
                    geom_jitter(alpha = 0.25, aes(colour = new_category), width = 0.25) +
                    scale_color_manual(values = biopsy_colour) +
                    theme_bw() +
@@ -1121,7 +1091,7 @@ ggsave(plot = HL_boxplot_0.001, "plots/extra_plots/HL_boxplot_0.001.tiff", "tiff
 
 ### Age vs. inbreeding coefficients
 
-```{r age vs. inbreeding plots, fig.height=4, fig.width=6}
+```{r age vs. inbreeding plots - Figure 5, fig.height=4, fig.width=6}
 # plot age vs. IR using the 0.001 dataset
 age_vs_IR_0.001 = ggplot(data = (combined_data %>% filter(new_category != "Live biopsy")),
                          aes(x = estimated_age, y = IR_0.001)) +
@@ -1349,7 +1319,7 @@ model_data$cHL = model_data$HL_0.001 - mean(model_data$HL_0.001)
 
 ### Model 1: Effect of internal relatedness (IR) on cause of mortality
 
-```{r model1 - IR}
+```{r model1 - IR (Figure 4)}
 # model
 model1 = brm(formula = mortality ~ 1 + cIR, 
              data = model_data,
@@ -1425,7 +1395,7 @@ system(cmd)
 
 To get at the potential effects of changing environment and differential exposure to stressors over time on cause of mortality, I will look at the effect of year found dead on the probability of dying from different causes.
 
-```{r model2 - year}
+```{r model2 - year (Figure 8)}
 # model
 model2 =  brm(formula = mortality ~ 1 + cYear, 
               data = model_data, 
@@ -1555,7 +1525,7 @@ ggsave(plot = model3_age_ridges, "plots/bayesian_models/model3_age_alldata.tiff"
 
 #### Age without neonatal mortality
 
-```{r model3.1 - age w/o neonatal mortality}
+```{r model3.1 - age w/o neonatal mortality (Figure 6)}
 # model
 model3.1 =  brm(formula = mortality ~ 1 + cAge, 
                 data = (model_data %>% filter(mortality != "Neonatal mortality")), 
@@ -1620,94 +1590,11 @@ cmd <- sprintf("gs -o \"%s\" -sDEVICE=pdfwrite -dDEVICEWIDTHPOINTS=%.2f -dDEVICE
 system(cmd)
 ```
 
-#### Categorical age class
-
-I will now assess the effects of age a different way by making a categorical age class variable and comparing how being in each age class changes the probability of/susceptibility to different causes of mortality.  
-  
-Per COSEWIC 2014: Neonates are newborns, 0 years old. Yearlings are 1. Calves are 2. Immature individuals are 3-7 (but one could consider calves as part of this group too). Mature individuals are >=8.  
-  
-I will break down the data into 4 classes: neonates, calves & yearlings (together because there are only 3 yearlings), immature, and mature and will look at how many individuals are in each age class and in each mortality category...
-```{r create age_class variable}
-# create age classes
-model_data = model_data %>% mutate(age_class = case_when(
-             estimated_age == 0 ~ "Neonate",
-             estimated_age >= 1 & estimated_age <= 2  ~ "Yearling/calf",
-             estimated_age >= 3 & estimated_age <= 7  ~ "Immature",
-             estimated_age >= 8  ~ "Mature"))
-
-# make age class a factor & order the levels
-model_data$age_class = factor(model_data$age_class,
-                              levels = c("Neonate",
-                                         "Yearling/calf",
-                                         "Immature",
-                                         "Mature"))
-
-# check the manipulation
-model_data %>% select(estimated_age, age_class)
-
-# count number of individuals in each age class
-table(model_data$age_class)
-
-# count number of individuals per age class in each mortality category
-table(model_data$age_class, model_data$mortality)
-```
-
-```{r model3.2 - age class (factor), eval=FALSE}
-# set proper contrasts for categorical data > sums contrast
-contrasts(model_data$age_class) = "contr.sum"
-
-# run model > there are issues with the chains not mixing, likely due to many zeroes in the data
-# interpret with caution?
-model3.2 = brm(formula = mortality ~ 1 + age_class,
-               data = model_data, 
-               family = categorical(link = logit))
-# increasing iterations >2000 did not solve R-hat/tail ESS warnings
-
-# evaluate model performance
-summary(model3.2)
-mcmc_trace(model3.2)
-
-# posterior predictive check
-pp_check(model3.2, ndraws = 100, type = "bars")
-
-# evaluate results
-posterior_summary(model3.2, probs = c(0.055, 0.945))
-
-# generate conditional effects
-model3.2_cond.effects = conditional_effects(model3.2, effects = "age_class", categorical = TRUE)
-
-#--- plot with facets by mortality category ---#
-
-# create colour palette
-mortality_colours = c("#2D4030", "#435927", "#747D1A",
-                      "#CCB404", "#E0D12F", "#D2D565",
-                      "#859782", "#738B9E", "#88A2B9")
-
-# facet plot > shows the estimated probability of each mortality category for each age class
-model3.2_ageclass_facets = plot(model3.2_cond.effects)[[1]] +
-                           facet_wrap("cats__") +
-                           scale_color_manual(values = mortality_colours) +
-                           theme_bw() +
-                           theme(text = element_text(size = 10,  family = "sans"),
-                                 axis.text.x = element_text(angle = 90,
-                                                            vjust = 0.5,
-                                                            hjust = 1),
-                                 legend.position = "none") +
-                           labs(title = "Model 3.2: mortality ~ age class",
-                                x = "Age class")
-model3.2_ageclass_facets
-
-# save plot
-ggsave(plot = model3.2_ageclass_facets, "plots/bayesian_models/model3.2_ageclass.tiff", "tiff", width = 6, height = 4, units = "in")
-```
-
-Chains did not mix. I will not proceed with this model.
-
 ### Model 4: Effect of the INTERACTION between IR and year found dead on cause of mortality
 
 Because inbreeding depression may depend on environmental challenges (i.e., genetic differences in fitness are conditional and only revealed under adverse environmental conditions), I wonder if the year found dead (and relevant environmental exposures) has an impact on the effect of inbreeding on cause of mortality. To test this, I will implement a model with an interaction between these two variables.
 
-```{r model 4 - IR x year}
+```{r model 4 - IR x year (Figure 9)}
 # model
 model4 = brm(formula = mortality ~ 1 + cIR + cYear + cIR:cYear, 
              data = model_data, 
@@ -1975,7 +1862,7 @@ ggsave(plot = model5_IRxAge_ridges, "plots/bayesian_models/model5_IRxAge.tiff", 
 ```
 
 #### IR x age without neonatal mortality
-```{r model5.1 - IR x age w/o neonatal mortality}
+```{r model5.1 - IR x age w/o neonatal mortality (Figure 7)}
 # model
 model5.1 = brm(formula = mortality ~ 1 + cIR + cAge + cIR:cAge,
              data = (model_data %>% filter(mortality != "Neonatal mortality")),
@@ -2111,11 +1998,8 @@ system(cmd)
 ### Model comparison
 ```{r loo model comparison}
 # models with neonatal mortality data
-# excluding 3.2 where chains did not mix
 loo(model1, model2, model3, model4, model5, moment_match = TRUE) 
 
 # compare the models based on data w/o neonatal mortality
 loo(model3.1, model5.1, moment_match = TRUE)
 ```
-
-*Focussing discussion on results in the following order: model 1, model 3/3.1, model 5.1, model 2, model 4.*
