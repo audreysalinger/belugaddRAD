@@ -1,0 +1,337 @@
+---
+title: "Beluga ddRADseq Bayesian models with live biopsy as reference category"
+author: "Audrey Salinger"
+date: "`r Sys.Date()`"
+output:
+  html_document: default
+  pdf_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+require(brms)
+require(posterior)
+require(bayesplot)
+require(ggplot2)
+require(ggridges)
+require(tidyr)
+require(dplyr)
+require(stringr)
+require(cowplot)
+```
+
+## Objectives
+
+Using Bayesian methods to answer the same questions, this time setting live biopsy category as control rather than trauma, since per Larrat et al. (2024), in contrast to what has been observed in other cetacean populations, SLE belugas dead from trauma do not appear to be in optimal body condition and therefore may not be otherwise healthy as originally presumed.  
+
+**run after primary script**
+
+## Organize the data for Bayesian models
+
+```{r import data}
+combined_data = read.delim("combined-data.tsv", sep = "\t")
+```
+
+I want to pull out the year from the "date found" data column, which does not have consistent formatting.
+```{r extract year found dead}
+# create a new column with just year found
+combined_data$year_found = str_extract(combined_data$date_found, "\\b\\d{4}\\b")
+
+# check the parsing
+combined_data %>% select(c(date_found, year_found))
+```
+  
+I will remove the "degenerative changes" mortality category because it contains only one individual.
+```{r data filter}
+model_data = combined_data %>% filter(split_inf_category != "Degenerative changes")
+```
+
+I will make the nominal predicted variable (cause of death) a factor.  
+I will center the metric predictors (age, year found, and inbreeding coefficient) around zero. 
+```{r data preparation}
+# nominal predicted variable is cause of mortality
+# make it a factor and order to put undetermined last
+model_data$mortality = factor(model_data$split_inf_category,
+                              levels = c("Live biopsy",
+                                         "Anthropogenic causes",
+                                         "Bacterial infection",
+                                         "Dystocia",
+                                         "Neonatal mortality",
+                                         "Neoplasia",
+                                         "Other infection",
+                                         "Protozoan infection",
+                                         "Verminous infection",
+                                         "Undetermined"))
+
+#--- prepare and standardize metric predictor variables ---#
+
+# age
+model_data$cAge = model_data$estimated_age - mean(model_data$estimated_age)
+
+# year found
+model_data$cYear = as.numeric(model_data$year_found) - mean(as.numeric(model_data$year_found))
+
+# inbreeding coefficients (I will standardize all coeffcients, but I am focusing on running models with IR)
+model_data$cIR = model_data$IR_0.001 - mean(model_data$IR_0.001)
+model_data$csMLH = model_data$sMLH_0.001 - mean(model_data$sMLH_0.001)
+model_data$cF = model_data$F_0.001 - mean(model_data$F_0.001)
+model_data$cHL = model_data$HL_0.001 - mean(model_data$HL_0.001)
+```
+
+## Model 1: Effect of internal relatedness (IR)
+
+```{r live biopsy - IR}
+model1 = brm(formula = mortality ~ 1 + cIR, 
+               data = model_data, 
+               family = categorical(link = logit))
+
+# evaluate model performance
+summary(model1)
+mcmc_trace(model1)
+
+# posterior predictive check
+pp_check(model1, ndraws = 100, type = "bars")
+
+# evaluate results
+mcmc_intervals(model1, regex_pars = "_cIR")
+mcmc_areas(model1, regex_pars = "_cIR")
+mcmc_areas_ridges(model1, regex_pars = "_cIR")
+
+posterior_summary(model1, probs = c(0.055, 0.945))
+
+# extract the data
+model1_post = as_draws_df(model1, variable = "_cIR", regex = TRUE)
+posterior::summarize_draws(model1_post)
+
+model1_slope_post = model1_post[, 1:9]
+colnames(model1_slope_post) = c("Anthropogenic causes", "Bacterial infection", "Dystocia",
+                                "Neonatal mortality", "Neoplasia",
+                                "Other infection", "Protozoan infection",
+                                "Verminous infection", "Undetermined")
+
+# plot slope posteriors
+model1_slope_tidy = pivot_longer(model1_slope_post,
+                                 cols = everything(),
+                                 names_to = "Mortality")
+
+biopsy_IR_ridges = ggplot(model1_slope_tidy,
+                          aes(x = value, y = Mortality,
+                              fill = factor(stat(quantile)))) +
+                   theme_bw() +
+                   theme(text = element_text(size = 17,  family = "sans")) +
+                   stat_density_ridges(geom = "density_ridges_gradient",
+                                       calc_ecdf = TRUE,
+                                       quantiles = c(0.025, 0.975)) +
+                   scale_fill_manual(values = alpha(c("#88A2B9", "#657E9D", "#88A2B9"), 0.6),
+                                     guide = "none") +
+                   geom_vline(xintercept = 0, alpha = 0.5, linetype = "dashed") + 
+                   labs(x = "Effect of IR on mortality cause
+(log odds, relative to live biopsy)",
+                        y = "Cause of mortality") +
+                   scale_y_discrete(expand = expansion(add = c(0.5, 2)))
+biopsy_IR_ridges
+
+# save plot
+ggsave(plot = biopsy_IR_ridges, "plots/bayesian_models/biopsy_IR_180mm.pdf", "pdf", width = 180, height = 120, units = "mm")
+
+# resize plot to 80 mm width using GhostScript
+infile  <- "plots/bayesian_models/biopsy_IR_180mm.pdf"
+outfile <- "../supplementary_figures/Figure_S4a.pdf"
+
+target_width_mm  <- 80
+target_height_mm <- 54
+
+mm_to_pt <- 2.83465
+w_pt <- target_width_mm * mm_to_pt
+h_pt <- target_height_mm * mm_to_pt
+
+cmd <- sprintf("gs -o \"%s\" -sDEVICE=pdfwrite -dDEVICEWIDTHPOINTS=%.2f -dDEVICEHEIGHTPOINTS=%.2f -dPDFFitPage \"%s\"",
+               outfile, w_pt, h_pt, infile)
+system(cmd)
+```
+
+## Model 2: Effect of year
+
+```{r live biopsy - year}
+model2 =  brm(formula = mortality ~ 1 + cYear, 
+              data = model_data, 
+              family = categorical(link = logit))
+
+# evaluate model performance
+summary(model2)
+mcmc_trace(model2)
+
+# posterior predictive check
+pp_check(model2, ndraws = 100, type = "bars")
+
+# evaluate results
+mcmc_intervals(model2, regex_pars = "_cYear")
+mcmc_areas(model2, regex_pars = "_cYear")
+mcmc_areas_ridges(model2, regex_pars = "_cYear")
+
+posterior_summary(model2, probs = c(0.055, 0.945))
+
+# extract the data
+model2_post = as_draws_df(model2, variable = "_cYear", regex = TRUE)
+posterior::summarize_draws(model2_post)
+
+model2_slope_post = model2_post[, 1:9]
+colnames(model2_slope_post) = c("Anthropogenic causes", "Bacterial infection", "Dystocia",
+                                "Neonatal mortality", "Neoplasia",
+                                "Other infection", "Protozoan infection",
+                                "Verminous infection", "Undetermined")
+
+# plot slope posteriors
+model2_slope_tidy = pivot_longer(model2_slope_post,
+                                 cols = everything(),
+                                 names_to = "Mortality")
+
+biopsy_year_ridges = ggplot(model2_slope_tidy,
+                            aes(x = value, y = Mortality,
+                                fill = factor(stat(quantile)))) +
+                     theme_bw() +
+                     theme(text = element_text(size = 17,  family = "sans")) +
+                     stat_density_ridges(geom = "density_ridges_gradient",
+                                         calc_ecdf = TRUE,
+                                         quantiles = c(0.025, 0.975)) +
+                     scale_fill_manual(values = alpha(c("#88A2B9", "#657E9D", "#88A2B9"), 0.6),
+                                       guide = "none") +
+                     geom_vline(xintercept = 0, alpha = 0.5, linetype = "dashed") + 
+                     labs(x = "Effect of year on mortality cause
+(log odds, relative to live biopsy)",
+                         y = "Cause of mortality") +
+                     scale_y_discrete(expand = expansion(add = c(0.5, 2)))
+
+biopsy_year_ridges
+
+# save plot
+ggsave(plot = biopsy_year_ridges, "plots/bayesian_models/biopsy_year_180mm.pdf", "pdf", width = 180, height = 120, units = "mm")
+
+# resize plot to 80 mm width using GhostScript
+infile  <- "plots/bayesian_models/biopsy_year_180mm.pdf"
+outfile <- "../supplementary_figures/Figure_S4b.pdf"
+
+cmd <- sprintf("gs -o \"%s\" -sDEVICE=pdfwrite -dDEVICEWIDTHPOINTS=%.2f -dDEVICEHEIGHTPOINTS=%.2f -dPDFFitPage \"%s\"",
+               outfile, w_pt, h_pt, infile)
+system(cmd)
+```
+
+## Model 3: Effect of the interaction between IR and year found dead
+
+```{r live biopsy - IR x year}
+model3 = brm(formula = mortality ~ 1 + cIR + cYear + cIR:cYear, 
+             data = model_data, 
+             family = categorical(link = logit))
+
+# evaluate model performance 
+summary(model3)
+
+# posterior predictive check
+pp_check(model3, ndraws = 100, type = "bars")
+
+#--- evaluate results ---#
+posterior_summary(model3, probs = c(0.055, 0.945))
+
+# IR
+mcmc_intervals(model3, pars = c("b_muAnthropogeniccauses_cIR", "b_muBacterialinfection_cIR", "b_muDystocia_cIR", "b_muNeonatalmortality_cIR", "b_muNeoplasia_cIR", "b_muOtherinfection_cIR", "b_muProtozoaninfection_cIR", "b_muVerminousinfection_cIR", "b_muUndetermined_cIR"))
+
+mcmc_areas(model3, pars = c("b_muAnthropogeniccauses_cIR", "b_muBacterialinfection_cIR", "b_muDystocia_cIR", "b_muNeonatalmortality_cIR", "b_muNeoplasia_cIR", "b_muOtherinfection_cIR", "b_muProtozoaninfection_cIR", "b_muVerminousinfection_cIR", "b_muUndetermined_cIR"))
+
+mcmc_areas_ridges(model3, pars = c("b_muAnthropogeniccauses_cIR", "b_muBacterialinfection_cIR", "b_muDystocia_cIR", "b_muNeonatalmortality_cIR", "b_muNeoplasia_cIR", "b_muOtherinfection_cIR", "b_muProtozoaninfection_cIR", "b_muVerminousinfection_cIR", "b_muUndetermined_cIR"))
+
+# year
+mcmc_intervals(model3, regex_pars = "_cYear")
+mcmc_areas(model3, regex_pars = "_cYear")
+mcmc_areas_ridges(model3, regex_pars = "_cYear")
+
+# interaction, IR x year
+mcmc_intervals(model3, regex_pars = "_cIR:cYear")
+mcmc_areas(model3, regex_pars = "_cIR:cYear")
+mcmc_areas_ridges(model3, regex_pars = "_cIR:cYear")
+
+# extract the data
+model3_IR_post = as_draws_df(model3, variable = c("b_muAnthropogeniccauses_cIR", "b_muBacterialinfection_cIR", "b_muDystocia_cIR", "b_muNeonatalmortality_cIR", "b_muNeoplasia_cIR", "b_muOtherinfection_cIR", "b_muProtozoaninfection_cIR", "b_muVerminousinfection_cIR", "b_muUndetermined_cIR"))
+
+model3_year_post = as_draws_df(model3, variable = "_cYear", regex = TRUE)
+
+model3_IRxYear_post = as_draws_df(model3, variable = "_cIR:cYear", regex = TRUE)
+
+# get slopes
+posterior::summarize_draws(model3_IR_post)
+posterior::summarize_draws(model3_year_post)
+posterior::summarize_draws(model3_IRxYear_post)
+
+model3_IR_slope_post = model3_IR_post[, 1:9]
+colnames(model3_IR_slope_post) = c("Anthropogenic causes", "Bacterial infection", "Dystocia", "Neonatal mortality", "Neoplasia", "Other infection", "Protozoan infection", "Verminous infection", "Undetermined")
+
+model3_year_slope_post = model3_year_post[, 1:9]
+colnames(model3_year_slope_post) = c("Anthropogenic causes", "Bacterial infection", "Dystocia", "Neonatal mortality", "Neoplasia", "Other infection", "Protozoan infection", "Verminous infection", "Undetermined")
+
+model3_IRxYear_slope_post = model3_IRxYear_post[, 1:9]
+colnames(model3_IRxYear_slope_post) = c("Anthropogenic causes", "Bacterial infection", "Dystocia", "Neonatal mortality", "Neoplasia", "Other infection", "Protozoan infection", "Verminous infection", "Undetermined")
+
+#--- plot slope posteriors ---#
+# interaction, IR x year
+model3_IRxYear_slope_tidy = pivot_longer(model3_IRxYear_slope_post,
+                                         cols = everything(),
+                                         names_to = "Mortality")
+
+biopsy_IRxYear_ridges = ggplot(model3_IRxYear_slope_tidy,
+                               aes(x = value, y = Mortality,
+                                   fill = factor(stat(quantile)))) +
+                        theme_bw() +
+                        theme(text = element_text(size = 17,  family = "sans"),
+                              axis.title.x = element_text(size = 15)) +
+                        stat_density_ridges(geom = "density_ridges_gradient",
+                                            calc_ecdf = TRUE,
+                                            quantiles = c(0.025, 0.975)) +
+                        scale_fill_manual(values = alpha(c("#88A2B9", "#657E9D", "#88A2B9"), 0.6),
+                                          guide = "none") +
+                        geom_vline(xintercept = 0, alpha = 0.5, linetype = "dashed") + 
+                        labs(x = "Interaction effect of IR and year on mortality cause
+(log odds, relative to live biopsy)",
+                            y = "Cause of mortality") +
+                        scale_y_discrete(expand = expansion(add = c(0.5, 2)))
+biopsy_IRxYear_ridges
+
+# save plot
+ggsave(plot = biopsy_IRxYear_ridges, "plots/bayesian_models/biopsy_IRxYear_180mm.pdf", "pdf", width = 180, height = 120, units = "mm")
+
+# resize plot to 80 mm width using GhostScript
+infile  <- "plots/bayesian_models/biopsy_IRxYear_180mm.pdf"
+outfile <- "../supplementary_figures/Figure_S4c.pdf"
+
+cmd <- sprintf("gs -o \"%s\" -sDEVICE=pdfwrite -dDEVICEWIDTHPOINTS=%.2f -dDEVICEHEIGHTPOINTS=%.2f -dPDFFitPage \"%s\"",
+               outfile, w_pt, h_pt, infile)
+system(cmd)
+```
+
+Arrange plots in a grid.
+```{r cowplot grid}
+biopsy_model_grid <-  plot_grid(biopsy_IR_ridges, 
+                                biopsy_year_ridges,
+                                biopsy_IRxYear_ridges,
+                      nrow = 3, ncol = 1,
+                      labels = c("(a)","(b)","(c)","(d)"), label_size = 20, hjust = -0.6, vjust = 2)
+biopsy_model_grid
+
+# save grid
+ggsave(plot = biopsy_model_grid, "plots/bayesian_models/biopsy_model_grid_180mm.pdf", "pdf", width = 180, height = 360, units = "mm")
+
+# resize grid to 80 mm width using GhostScript
+infile  <- "plots/bayesian_models/biopsy_model_grid_180mm.pdf"
+outfile <- "../supplementary_figures/Figure_S4.pdf"
+
+target_width_mm  <- 80
+target_height_mm <- 54*3
+
+mm_to_pt <- 2.83465
+w_pt <- target_width_mm * mm_to_pt
+h_pt <- target_height_mm * mm_to_pt
+
+cmd <- sprintf("gs -o \"%s\" -sDEVICE=pdfwrite -dDEVICEWIDTHPOINTS=%.2f -dDEVICEHEIGHTPOINTS=%.2f -dPDFFitPage \"%s\"",
+               outfile, w_pt, h_pt, infile)
+system(cmd)
+```
+
