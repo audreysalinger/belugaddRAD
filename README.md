@@ -1,6 +1,6 @@
 # belugaddRAD
 
-This is repository for the code associated with assessing inbreeding depression in St. Lawrence Estuary beluga whales using ddRADseq.
+This is a repository for the code associated with assessing inbreeding depression in St. Lawrence Estuary beluga whales using ddRADseq.
 
 The **raw-to-variants/** directory contains the scripts used to get from raw sequence files to Stacks genotype calls (vcf files).
 It is organized into sub-directories for the larger steps.
