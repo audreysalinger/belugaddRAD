@@ -1,11 +1,14 @@
 #!/bin/bash
 
+#--- from the analysis directory ---#
+mkdir gt-conversion-check
+
 #################################################################################
 #  extract first 5 and last 5 genotypes for the first 5 and last 5 individuals  #
 #                  to check against transformed genotype files                  #
 #################################################################################
 
-cd ../final-vcfs
+cd final-vcfs
 
 ###################
 #  0.01 data set  #
