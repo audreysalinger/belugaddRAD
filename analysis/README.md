@@ -1,4 +1,4 @@
-## Data files and scripts for R analyses
+## Data files and scripts for R analysis
 
 I made an R project for this analysis, which helps package the scripts and data into a self-contained working directory. The **analysis.Rproj** file is a shortcut for opening this project space.
 
