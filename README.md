@@ -1,4 +1,3 @@
-[![DOI Badge](https://shields.io)](https://doi.org/10.5281/zenodo.22281904)
 # beluga ddRAD: Quantifying the association between inbreeding and mortality in endangered St. Lawrence Estuary beluga whales
 
 This is a repository for the code associated with assessing inbreeding depression in St. Lawrence Estuary beluga whales using ddRADseq.
