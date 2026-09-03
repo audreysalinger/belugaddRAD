@@ -1,5 +1,7 @@
 # beluga ddRAD: Quantifying the association between inbreeding and mortality in endangered St. Lawrence Estuary beluga whales
 
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.22281904.svg)](https://doi.org/10.5281/zenodo.22281904)
+
 This is a repository for the code associated with assessing inbreeding depression in St. Lawrence Estuary beluga whales using ddRADseq.
 
 The **raw-to-variants/** directory contains the scripts used to get from raw sequence files to Stacks genotype calls (vcf files).
